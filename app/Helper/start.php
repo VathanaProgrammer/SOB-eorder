@@ -44,6 +44,16 @@ if (!function_exists('user')) {
     }
 }
 
+function exchange_rate($code = 'KHR')
+{
+    if (!restaurant()) {
+        return 1;
+    }
+
+    return Currency::where('currency_code', $code)
+        ->where('restaurant_id', restaurant()->id)
+        ->value('exchange_rate') ?? 1;
+}
 
 function customer()
 {
@@ -605,6 +615,27 @@ if (!function_exists('currency_format')) {
     }
 }
 
+if (!function_exists('khr_currency_format')) {
+
+    function khr_currency_format($amount, $showSymbol = true)
+    {
+        // Get KHR currency from database
+        $khrCurrency = Currency::where('currency_code', 'KHR')->first();
+        
+        // If KHR currency exists in database, use it
+        if ($khrCurrency) {
+            return currency_format($amount, $khrCurrency->id, $showSymbol);
+        }
+        
+        // Fallback KHR formatting if not in database
+        $currency_symbol = $showSymbol ? '៛' : '';
+        $amount = number_format(floatval($amount), 0, '.', ',');
+        
+        // KHR typically goes on the right without space
+        return $amount . $currency_symbol;
+    }
+}
+
 
 if (!function_exists('global_currency_format_setting')) {
 
@@ -695,16 +726,8 @@ if (!function_exists('isOrderPrefixEnabled')) {
             return false;
         }
 
-        $settings = getOrderNumberSetting($branch->id);
+        $settings = OrderNumberSetting::where('branch_id', $branch->id)->first();
         return $settings && $settings->enable_feature;
-    }
-}
-
-if (!function_exists('getOrderNumberSetting')) {
-    function getOrderNumberSetting($branchId) {
-        return cache()->remember('order_number_setting_' . $branchId, 60 * 60 * 24, function () use ($branchId) {
-            return OrderNumberSetting::where('branch_id', $branchId)->first() ?? new OrderNumberSetting();
-        });
     }
 }
 

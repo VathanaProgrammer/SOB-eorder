@@ -140,7 +140,7 @@ class Order extends BaseModel
     public static function generateOrderNumber($branch)
     {
         // Check if order number settings exist and feature is enabled
-        $settings = getOrderNumberSetting($branch->id);
+        $settings = OrderNumberSetting::where('branch_id', $branch->id)->first();
 
         if ($settings && $settings->enable_feature) {
             return self::generateFormattedOrderNumber($branch->id, $settings);

@@ -29,6 +29,11 @@
                                 </th>
 
                                 <th scope="col"
+                                    class="py-2.5 px-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400">
+                                    @lang('modules.settings.exchangeRate')
+                                </th>
+
+                                <th scope="col"
                                     class="py-2.5 px-4 text-xs font-medium text-gray-500 uppercase dark:text-gray-400 text-right">
                                     @lang('app.action')
                                 </th>
@@ -48,6 +53,10 @@
 
                                 <td class="py-2.5 px-4 text-base text-gray-900 whitespace-nowrap dark:text-white">
                                     {{ currency_format(12345.6789, $item->id) }}
+                                </td>
+
+                                <td class="py-2.5 px-4 text-base text-gray-900 whitespace-nowrap dark:text-white">
+                                    {{ currency_format($item->exchange_rate, $item->id) }} / $1
                                 </td>
 
                                 <td class="py-2.5 px-4 space-x-2 whitespace-nowrap text-right">
