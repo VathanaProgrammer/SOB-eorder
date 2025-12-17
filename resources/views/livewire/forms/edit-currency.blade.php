@@ -21,6 +21,12 @@
                 <x-input-error for="currencyCode" class="mt-2" />
             </div>
 
+            <div>
+                <x-label for="exchangeRate" value="{{ __('modules.settings.exchangeRate') }}" />
+                <x-input id="exchangeRate" class="block mt-1 w-full" type="text" autofocus wire:model='exchangeRate' />
+                <x-input-error for="exchangeRate" class="mt-2" />
+            </div>
+
         </div>
 
         <h3 class="text-lg mt-4">@lang('modules.settings.currencyFormat')</h3>

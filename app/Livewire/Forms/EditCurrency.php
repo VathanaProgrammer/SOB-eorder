@@ -10,6 +10,7 @@ class EditCurrency extends Component
     public $restaurantCurrency;
     public $currencySymbol;
     public $currencyCode;
+    public $exchangeRate;
     public $currencyPosition;
     public $thousandSeparator;
     public $decimalSeparator;
@@ -20,6 +21,7 @@ class EditCurrency extends Component
         $this->restaurantCurrency = $this->currency->currency_name;
         $this->currencySymbol = $this->currency->currency_symbol;
         $this->currencyCode = $this->currency->currency_code;
+        $this->exchangeRate = $this->currency->exchange_rate;
         $this->currencyPosition = $this->currency->currency_position;
         $this->thousandSeparator = $this->currency->thousand_separator ?? ',';
         $this->decimalSeparator = $this->currency->decimal_separator ?? '.';
@@ -37,6 +39,7 @@ class EditCurrency extends Component
         $this->currency->currency_name = $this->restaurantCurrency;
         $this->currency->currency_symbol = $this->currencySymbol;
         $this->currency->currency_code = $this->currencyCode;
+        $this->currency->exchange_rate = $this->exchangeRate;
         $this->currency->currency_position = $this->currencyPosition;
         $this->currency->thousand_separator = $this->thousandSeparator;
         $this->currency->decimal_separator = $this->decimalSeparator;

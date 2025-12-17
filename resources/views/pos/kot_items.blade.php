@@ -1,5 +1,5 @@
 <div
-    class="lg:w-6/12 flex flex-col bg-white  dark:border-gray-700  pr-4 px-2 py-4 dark:bg-gray-800 lg:sticky  overflow-hidden rounded-md">
+    class="lg:w-6/12 flex flex-col bg-white border-l dark:border-gray-700 min-h-screen h-auto pr-4 px-2 py-4 dark:bg-gray-800 relative">
 
     {{-- Order Type Indicator --}}
     @if($orderTypeId)
@@ -369,8 +369,8 @@
         </div>
     </div>
 
-    <div class="sticky bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
-        <div class="h-auto p-4 select-none text-center bg-gray-50 rounded space-y-2 dark:bg-gray-700">
+    <div class="lg:min-w-20 sticky bottom-0">
+        <div class="h-auto p-4 mt-3 select-none text-center bg-gray-50 rounded space-y-4 dark:bg-gray-700">
             @if (count($orderItemList) > 0 && user_can('Add Discount on POS'))
                 <div class="text-left">
                     <x-secondary-button wire:click="showAddDiscount">
@@ -385,7 +385,7 @@
                 </div>
             @endif
 
-            <div class="flex justify-between text-gray-500 text-xs dark:text-neutral-400">
+            <div class="flex justify-between text-gray-500 text-sm dark:text-neutral-400">
                 <div>
                     @lang('modules.order.totalItem')
                 </div>
@@ -393,7 +393,7 @@
                     {{ count($orderItemList) }}
                 </div>
             </div>
-            <div class="flex justify-between text-gray-500 text-xs dark:text-neutral-400">
+            <div class="flex justify-between text-gray-500 text-sm dark:text-neutral-400">
                 <div>
                     @lang('modules.order.subTotal')
                 </div>
@@ -404,7 +404,7 @@
 
             @if ($discountAmount)
                 <div wire:key="discountAmount"
-                    class="flex justify-between text-green-500 text-xs dark:text-green-400">
+                    class="flex justify-between text-green-500 text-sm dark:text-green-400">
                     <div class="inline-flex items-center gap-x-1">@lang('modules.order.discount') @if ($discountType == 'percent')
                             ({{ $discountValue }}%)
                         @endif
@@ -414,7 +414,7 @@
                                 xmlns="http://www.w3.org/2000/svg">
                                 <path fill-rule="evenodd"
                                     d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                                clip-rule="evenodd" />
+                                    clip-rule="evenodd" />
                             </svg>
                         </span>
                     </div>
@@ -425,7 +425,7 @@
             @endif
 
             @if ($orderType === 'delivery')
-                <div class="flex justify-between items-center text-gray-500 text-xs dark:text-neutral-400">
+                <div class="flex justify-between items-center text-gray-500 text-sm dark:text-neutral-400">
                     <div>
                         @lang('modules.delivery.deliveryFee')
                         <span class="text-xs text-gray-400">
@@ -446,7 +446,7 @@
             @if (!$orderID && count($orderItemList) > 0 && $extraCharges)
                 @foreach ($extraCharges as $charge)
                     <div wire:key="extraCharge-{{ $loop->index }}"
-                        class="flex justify-between text-gray-500 text-xs dark:text-neutral-400">
+                        class="flex justify-between text-gray-500 text-sm dark:text-neutral-400">
                         <div class="inline-flex items-center gap-x-1">{{ $charge->charge_name }}
                             @if ($charge->charge_type == 'percent')
                                 ({{ $charge->charge_value }}%)
@@ -470,7 +470,7 @@
 
             @if ($taxMode == 'order')
                 @foreach ($taxes as $item)
-                    <div class="flex justify-between text-gray-500 text-xs dark:text-neutral-400">
+                    <div class="flex justify-between text-gray-500 text-sm dark:text-neutral-400">
                         <div>
                             {{ $item->tax_name }} ({{ $item->tax_percent }}%)
                         </div>
@@ -533,6 +533,15 @@
                 </div>
                 <div>
                     {{ currency_format($total, $restaurant->currency_id) }}
+                </div>
+            </div>
+
+            <div class="flex justify-between font-medium dark:text-neutral-300">
+                <div>
+                    @lang('modules.order.totalInRiels')
+                </div>
+                <div>
+                    {{ number_format($total * exchange_rate('KHR'), 0, '.', ',') }}៛
                 </div>
             </div>
         </div>
