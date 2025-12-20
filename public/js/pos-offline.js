@@ -56,27 +56,41 @@ document.addEventListener('livewire:load', function () {
 });
 
 window.handleOfflineSaveOrder = function(orderType) {
-    const orderData = {
-        order_number: `OFF-${Date.now()}`,
-        items: window.POS_ITEMS || [], // optional: fallback if you pass from Blade
-        discounts: window.POS_DISCOUNTS || 0,
-        taxes: window.POS_TAXES || [],
-        extra_charges: window.POS_EXTRA_CHARGES || [],
-        deliveryFee: window.POS_DELIVERY_FEE || 0,
-        total: window.POS_TOTAL || 0,
-        customer: window.POS_CUSTOMER || null,
-        orderType,
-        timestamp: new Date().toISOString(),
-        status: 'offline',
-    };
+    try {
+        const orderData = {
+            order_number: `OFF-${Date.now()}`,
+            items: window.POS_ITEMS || [],
+            discounts: window.POS_DISCOUNTS || 0,
+            taxes: window.POS_TAXES || [],
+            extra_charges: window.POS_EXTRA_CHARGES || [],
+            deliveryFee: window.POS_DELIVERY_FEE || 0,
+            total: window.POS_TOTAL || 0,
+            customer: window.POS_CUSTOMER || null,
+            orderType,
+            timestamp: new Date().toISOString(),
+            status: 'offline',
+        };
 
-    // Save locally
-    let offlineOrders = JSON.parse(localStorage.getItem('pos_offline_orders') || '[]');
-    offlineOrders.push(orderData);
-    localStorage.setItem('pos_offline_orders', JSON.stringify(offlineOrders));
+        // Save offline
+        let offlineOrders = JSON.parse(localStorage.getItem('pos_offline_orders') || '[]');
+        offlineOrders.push(orderData);
+        localStorage.setItem('pos_offline_orders', JSON.stringify(offlineOrders));
 
-    // Print invoice immediately
-    printInvoice(orderData);
+        // Print invoice only if function exists
+        if (typeof printInvoice === 'function') {
+            try {
+                printInvoice(orderData);
+            } catch (printError) {
+                console.error('Failed to print invoice:', printError);
+            }
+        } else {
+            console.warn('printInvoice() is not defined. Skipping printing.');
+        }
 
-    alert('Order saved offline! It will sync when you are back online.');
-}
+        alert('Order saved offline! It will sync when you are back online.');
+
+    } catch (err) {
+        console.error('Failed to save order offline:', err);
+        alert('Something went wrong while saving offline. Check console.');
+    }
+};
