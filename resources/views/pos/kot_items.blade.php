@@ -943,4 +943,3 @@
         </x-slot>
     </x-dialog-modal>
 </div>
-<script src="{{ asset('js/pos-offline.js') }}"></script>
