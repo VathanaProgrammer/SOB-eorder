@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
         $this->call(CountrySeeder::class);
         $this->call(GlobalCurrencySeeder::class);
         $this->call(GlobalSettingSeeder::class);
+        $this->call(GlobalCurrencySeeder::class);
         $this->call(ModuleSeeder::class);
         $this->call(PackageSeeder::class);
         $this->call(SuperadminSeeder::class);

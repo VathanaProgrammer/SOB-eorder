@@ -162,6 +162,8 @@ class RestaurantObserver
             $currency->currency_name = $globalCurrency->currency_name;
             $currency->currency_symbol = $globalCurrency->currency_symbol;
             $currency->currency_code = $globalCurrency->currency_code;
+            $currency->exchange_rate = $globalCurrency->exchange_rate;
+            $currency->currency_position = $globalCurrency->currency_position;
             $currency->restaurant_id = $restaurant->id;
             $currency->saveQuietly();
         }

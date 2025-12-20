@@ -29,6 +29,19 @@ class GlobalCurrencySeeder extends Seeder
             'decimal_separator' => '.',
         ]);
 
+        GlobalCurrency::updateOrCreate([
+            'currency_code' => 'KHR'
+        ], [
+            'currency_name' => 'Riels',
+            'currency_symbol' => '៛',
+            'currency_code' => 'KHR',
+            'currency_position' => 'right',
+            'no_of_decimal' => 2,
+            'exchange_rate' => 4100,
+            'thousand_separator' => ',',
+            'decimal_separator' => '.',
+        ]);
+
         GlobalCurrency::firstOrCreate([
             'currency_code' => 'INR'
         ], [
