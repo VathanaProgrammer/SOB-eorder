@@ -55,28 +55,28 @@ document.addEventListener('livewire:load', function () {
     });
 });
 
-
-const handleOfflineSaveOrder = (orderType) => {
+window.handleOfflineSaveOrder = function(orderType) {
     const orderData = {
-        order_number: generateOfflineOrderNumber(),
-        items: orderItemList, // from your Livewire state or JS
-        discounts: discountAmount,
-        taxes: taxes,
-        extra_charges: extraCharges,
-        deliveryFee: deliveryFee,
-        total: total,
-        customer: customerData,
-        table: currentTable,
+        order_number: `OFF-${Date.now()}`,
+        items: window.POS_ITEMS || [], // optional: fallback if you pass from Blade
+        discounts: window.POS_DISCOUNTS || 0,
+        taxes: window.POS_TAXES || [],
+        extra_charges: window.POS_EXTRA_CHARGES || [],
+        deliveryFee: window.POS_DELIVERY_FEE || 0,
+        total: window.POS_TOTAL || 0,
+        customer: window.POS_CUSTOMER || null,
         orderType,
         timestamp: new Date().toISOString(),
-        status: 'offline', // mark as offline
+        status: 'offline',
     };
 
-    // Save to localStorage (or IndexedDB for larger data)
-    const offlineOrders = JSON.parse(localStorage.getItem("pos_offline_orders") || "[]");
+    // Save locally
+    let offlineOrders = JSON.parse(localStorage.getItem('pos_offline_orders') || '[]');
     offlineOrders.push(orderData);
-    localStorage.setItem("pos_offline_orders", JSON.stringify(offlineOrders));
+    localStorage.setItem('pos_offline_orders', JSON.stringify(offlineOrders));
 
-    // Generate and print invoice immediately
+    // Print invoice immediately
     printInvoice(orderData);
-};
+
+    alert('Order saved offline! It will sync when you are back online.');
+}
