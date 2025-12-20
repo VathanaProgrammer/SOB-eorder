@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <title>KOT Ticket</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'DejaVu Sans', Arial, sans-serif; }
+        [dir="rtl"] { text-align: right; }
+        [dir="ltr"] { text-align: left; }
+
+        .receipt { width: 80mm; padding: 6.35mm; page-break-after: always; }
+        .header { text-align: center; margin-bottom: 3mm; }
+        .bold { font-weight: bold; }
+        .restaurant-info { font-size: 9pt; margin-bottom: 1mm; }
+        .order-info { text-align: center; border-top: 1px dashed #000; border-bottom: 1px dashed #000; padding: 2mm 0; margin-bottom: 3mm; font-size: 10pt; }
+        .kot-title { font-size: 16pt; font-weight: bold; text-align: center; margin-bottom: 2mm; }
+        .items-table { width: 100%; border-collapse: collapse; margin-bottom: 3mm; font-size: 10pt; }
+        .items-table th { padding: 1mm; border-bottom: 1px solid #000; }
+        .items-table td { padding: 1mm 0; vertical-align: top; }
+        .qty { width: 12%; text-align: center; }
+        .description { width: 88%; }
+        .modifiers { font-size: 9pt; color: #555; }
+        .footer { text-align: center; margin-top: 3mm; font-size: 10pt; padding-top: 2mm; border-top: 1px dashed #000; }
+        .italic { font-style: italic; }
+        .order-row { width: 100%; margin-bottom: 5px; }
+        .order-row table { width: 100%; border-collapse: collapse; }
+        .order-left { text-align: left; width: 50%; }
+        .order-right { text-align: right; width: 50%; }
+
+        @media print {
+            @page { margin: 0; size: 80mm auto; }
+        }
+    </style>
+</head>
+<body>
+    <div class="receipt" id="kot-receipt">
+        <!-- KOT content will be injected here -->
+    </div>
+
+    <script>
+        // Example KOT data (can be loaded from localStorage or offline DB)
+        const kotData = {
+            restaurant: { name: "Demo Restaurant" },
+            kotNumber: 101,
+            tokenNumber: 5,
+            order: {
+                number: "ORD-123",
+                table: "A1",
+                date: "20-12-2025",
+                time: "09:30 AM",
+                waiter: "John Doe",
+                type: "dine_in",
+                pickupTime: null
+            },
+            items: [
+                { name: "Burger", variation: "Cheese", quantity: 2, modifiers: ["Extra sauce"], note: "" },
+                { name: "Fries", variation: null, quantity: 1, modifiers: [], note: "No salt" }
+            ],
+            note: "Please serve hot."
+        };
+
+        function renderKOT(kot) {
+            const receipt = document.getElementById("kot-receipt");
+
+            // Header
+            receipt.innerHTML = `
+                <div class="header">
+                    <div class="restaurant-info">${kot.restaurant.name}</div>
+                </div>
+                <div class="kot-title">
+                    KOT <span class="bold">#${kot.kotNumber}</span>
+                    ${kot.tokenNumber ? `<div style="font-size: 14pt; margin-top:1mm;">Token #: <span class="bold">${kot.tokenNumber}</span></div>` : ''}
+                </div>
+                <div class="order-info">
+                    <div class="order-row">
+                        <table>
+                            <tr>
+                                <td class="order-left"><span class="bold">${kot.order.number}</span></td>
+                                <td class="order-right">Table: <span class="bold">${kot.order.table || '-'}</span></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="order-row">
+                        <table>
+                            <tr>
+                                <td class="order-left">Date: ${kot.order.date}</td>
+                                <td class="order-right">Time: ${kot.order.time}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    ${kot.order.waiter ? `<div class="order-row">
+                        <table><tr><td class="order-left">Waiter: <span class="bold">${kot.order.waiter}</span></td><td class="order-right"></td></tr></table>
+                    </div>` : ''}
+                </div>
+                <table class="items-table">
+                    <thead>
+                        <tr><th class="description">Item</th><th class="qty">Qty</th></tr>
+                    </thead>
+                    <tbody>
+                        ${kot.items.map(item => `
+                            <tr>
+                                <td class="description">
+                                    ${item.name}${item.variation ? `<br><small>(${item.variation})</small>` : ''}
+                                    ${item.modifiers.length ? item.modifiers.map(m => `<div class="modifiers">• ${m}</div>`).join('') : ''}
+                                    ${item.note ? `<div class="modifiers"><strong>Note:</strong> ${item.note}</div>` : ''}
+                                </td>
+                                <td class="qty">${item.quantity}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                ${kot.note ? `<div class="footer"><strong>Special Instructions:</strong><div class="italic">${kot.note}</div></div>` : ''}
+            `;
+        }
+
+        renderKOT(kotData);
+
+        // Optional: trigger print (offline)
+        function printKOT() {
+            const printWindow = window.open('', '_blank', 'width=400,height=600');
+            printWindow.document.write('<html><head><title>KOT Ticket</title></head><body>');
+            printWindow.document.write(document.getElementById('kot-receipt').innerHTML);
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+            printWindow.print();
+        }
+
+        // Example usage: call printKOT() when ready
+        // printKOT();
+    </script>
+</body>
+</html>

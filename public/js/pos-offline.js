@@ -55,42 +55,162 @@ document.addEventListener('livewire:load', function () {
     });
 });
 
-window.handleOfflineSaveOrder = function(orderType) {
+wind// pos-offline.js
+
+// Existing online/offline detection code...
+// (your code already here)
+
+// ------------------------------
+// 5. Render KOT HTML offline
+// ------------------------------
+window.printOfflineKOT = function (orderData) {
+    if (!orderData || !orderData.items || orderData.items.length === 0) {
+        console.warn('No items to print KOT.');
+        return;
+    }
+
+    const kot = {
+        restaurant: { name: orderData.restaurantName || 'Demo Restaurant' },
+        kotNumber: orderData.kotNumber || (`OFF-${Date.now()}`),
+        tokenNumber: orderData.tokenNumber || null,
+        order: {
+            number: orderData.order_number || `OFF-${Date.now()}`,
+            table: orderData.table || '-',
+            date: new Date(orderData.timestamp).toLocaleDateString(),
+            time: new Date(orderData.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            waiter: orderData.waiter || null,
+            type: orderData.orderType || 'offline',
+            pickupTime: orderData.pickupTime || null
+        },
+        items: orderData.items.map(i => ({
+            name: i.name || i.item_name || 'Item',
+            variation: i.variation || null,
+            quantity: i.qty || i.quantity || 1,
+            modifiers: i.modifiers || [],
+            note: i.note || ''
+        })),
+        note: orderData.note || ''
+    };
+
+    // Create new window for printing
+    const printWindow = window.open('', '_blank', 'width=400,height=600');
+    if (!printWindow) {
+        console.error('Popup blocked, cannot print KOT.');
+        return;
+    }
+
+    // KOT HTML (same as your template)
+    const html = `
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>KOT Ticket</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; font-family:'DejaVu Sans', Arial, sans-serif; }
+[dir="rtl"]{ text-align:right; } [dir="ltr"]{ text-align:left; }
+.receipt { width:80mm; padding:6.35mm; page-break-after:always; }
+.header{ text-align:center; margin-bottom:3mm; } .bold{ font-weight:bold; }
+.restaurant-info{ font-size:9pt; margin-bottom:1mm; } 
+.order-info{ text-align:center; border-top:1px dashed #000; border-bottom:1px dashed #000; padding:2mm 0; margin-bottom:3mm; font-size:10pt; }
+.kot-title{ font-size:16pt; font-weight:bold; text-align:center; margin-bottom:2mm; }
+.items-table{ width:100%; border-collapse:collapse; margin-bottom:3mm; font-size:10pt; }
+.items-table th{ padding:1mm; border-bottom:1px solid #000; } 
+.items-table td{ padding:1mm 0; vertical-align:top; } 
+.qty{ width:12%; text-align:center; } .description{ width:88%; } 
+.modifiers{ font-size:9pt; color:#555; } 
+.footer{ text-align:center; margin-top:3mm; font-size:10pt; padding-top:2mm; border-top:1px dashed #000; } 
+.italic{ font-style:italic; } .order-row{ width:100%; margin-bottom:5px; } 
+.order-row table{ width:100%; border-collapse:collapse; } 
+.order-left{ text-align:left; width:50%; } .order-right{ text-align:right; width:50%; }
+@media print{ @page{ margin:0; size:80mm auto; } }
+</style>
+</head>
+<body>
+<div class="receipt">
+<div class="header">
+<div class="restaurant-info">${kot.restaurant.name}</div>
+</div>
+<div class="kot-title">
+KOT <span class="bold">#${kot.kotNumber}</span>
+${kot.tokenNumber ? `<div style="font-size:14pt; margin-top:1mm;">Token #: <span class="bold">${kot.tokenNumber}</span></div>` : ''}
+</div>
+<div class="order-info">
+<div class="order-row">
+<table>
+<tr>
+<td class="order-left"><span class="bold">${kot.order.number}</span></td>
+<td class="order-right">Table: <span class="bold">${kot.order.table}</span></td>
+</tr>
+</table>
+</div>
+<div class="order-row">
+<table>
+<tr>
+<td class="order-left">Date: ${kot.order.date}</td>
+<td class="order-right">Time: ${kot.order.time}</td>
+</tr>
+</table>
+</div>
+${kot.order.waiter ? `<div class="order-row"><table><tr><td class="order-left">Waiter: <span class="bold">${kot.order.waiter}</span></td><td class="order-right"></td></tr></table></div>` : ''}
+</div>
+<table class="items-table">
+<thead>
+<tr><th class="description">Item</th><th class="qty">Qty</th></tr>
+</thead>
+<tbody>
+${kot.items.map(item => `
+<tr>
+<td class="description">
+${item.name}${item.variation ? `<br><small>(${item.variation})</small>` : ''}
+${item.modifiers.length ? item.modifiers.map(m => `<div class="modifiers">• ${m}</div>`).join('') : ''}
+${item.note ? `<div class="modifiers"><strong>Note:</strong> ${item.note}</div>` : ''}
+</td>
+<td class="qty">${item.quantity}</td>
+</tr>
+`).join('')}
+</tbody>
+</table>
+${kot.note ? `<div class="footer"><strong>Special Instructions:</strong><div class="italic">${kot.note}</div></div>` : ''}
+</div>
+<script>
+window.onload = function(){ window.print(); window.onafterprint=()=>window.close(); };
+</script>
+</body>
+</html>
+`;
+
+    printWindow.document.open();
+    printWindow.document.write(html);
+    printWindow.document.close();
+};
+
+// ------------------------------
+// 6. Use it in offline save
+// ------------------------------
+window.handleOfflineSaveOrder = function (orderType) {
     try {
         const orderData = {
+            restaurantName: "Demo Restaurant",
+            kotNumber: null, // optional, can generate dynamic
             order_number: `OFF-${Date.now()}`,
+            table: window.POS_TABLE || '-',
             items: window.POS_ITEMS || [],
-            discounts: window.POS_DISCOUNTS || 0,
-            taxes: window.POS_TAXES || [],
-            extra_charges: window.POS_EXTRA_CHARGES || [],
-            deliveryFee: window.POS_DELIVERY_FEE || 0,
-            total: window.POS_TOTAL || 0,
-            customer: window.POS_CUSTOMER || null,
             orderType,
+            note: window.POS_NOTE || '',
             timestamp: new Date().toISOString(),
-            status: 'offline',
+            waiter: window.POS_WAITER || null
         };
 
-        // Save offline
         let offlineOrders = JSON.parse(localStorage.getItem('pos_offline_orders') || '[]');
         offlineOrders.push(orderData);
         localStorage.setItem('pos_offline_orders', JSON.stringify(offlineOrders));
 
-        // Print invoice only if function exists
-        if (typeof printInvoice === 'function') {
-            try {
-                printInvoice(orderData);
-            } catch (printError) {
-                console.error('Failed to print invoice:', printError);
-            }
-        } else {
-            console.warn('printInvoice() is not defined. Skipping printing.');
-        }
+        // Print KOT immediately
+        window.printOfflineKOT(orderData);
 
-        alert('Order saved offline! It will sync when you are back online.');
-
+        alert('Offline order saved and KOT printed!');
     } catch (err) {
-        console.error('Failed to save order offline:', err);
-        alert('Something went wrong while saving offline. Check console.');
+        console.error('Failed to save offline order:', err);
     }
 };

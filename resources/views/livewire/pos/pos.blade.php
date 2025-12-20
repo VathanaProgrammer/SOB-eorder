@@ -206,7 +206,6 @@
                 });
             </script>
         @endscript
-        <script src="{{ asset('js/pos-offline.js') }}"></script>
     @endif
 
 </div>

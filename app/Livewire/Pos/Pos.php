@@ -144,6 +144,32 @@ class Pos extends Component
     public $shouldBlockPos = false;
     public $restaurant;
 
+    public function getPrintPayload()
+    {
+        return [
+            'order_id' => $this->orderID,
+            'items' => collect($this->orderItemList)->map(function ($item, $key) {
+                return [
+                    'name' => $item->name,
+                    'qty' => $this->orderItemQty[$key] ?? 1,
+                    'price' => $this->orderItemAmount[$key] ?? 0,
+                    'note' => $this->itemNotes[$key] ?? '',
+                ];
+            })->values(),
+            'subtotal' => $this->subTotal,
+            'total' => $this->total,
+        ];
+    }
+
+    public function printOrderJS()
+    {
+        $payload = $this->getPrintPayload();
+
+        $this->dispatch('print-order', payload: $payload);
+    }
+
+
+
     public function setCustomer($customerId = null)
     {
         $this->customerId = $customerId;
@@ -230,7 +256,7 @@ class Pos extends Component
             // For draft orders, automatically set orderDetail to true to load items
             if ($order->status === 'draft') {
                 $this->orderDetail = true;
-                
+
                 // Generate order number for draft orders if it doesn't exist
                 if (!$order->order_number) {
                     $orderNumberData = Order::generateOrderNumber(branch());
@@ -244,7 +270,7 @@ class Pos extends Component
             }
 
             $this->orderNumber = $order->order_number;
-            $this->formattedOrderNumber = $order->formatted_order_number;         
+            $this->formattedOrderNumber = $order->formatted_order_number;
             $this->noOfPax = $order->number_of_pax;
             $this->selectWaiter = $order->waiter_id ?? null;
             $this->tableNo = $order->table->table_code ?? null;
@@ -266,13 +292,13 @@ class Pos extends Component
                 $this->orderDetail = $order;
 
                 $this->selectDeliveryExecutive = $order->delivery_executive_id;
-                
+
                 // Load customer for draft orders
                 if ($order->status === 'draft' && $order->customer_id) {
                     $this->customerId = $order->customer_id;
                     $this->customer = $order->customer;
                 }
-                
+
                 $this->setupOrderItems();
             }
         }
@@ -674,7 +700,7 @@ class Pos extends Component
     {
         if ($this->orderDetail) {
             $normalizedDeliveryAppId = $this->normalizeDeliveryAppId();
-            
+
             // Handle draft orders - they have OrderItems instead of KOT items
             if ($this->orderDetail->status === 'draft' && $this->orderDetail->items->count() > 0) {
                 foreach ($this->orderDetail->items as $orderItem) {
@@ -800,15 +826,15 @@ class Pos extends Component
                             ->whereNull('menu_item_variation_id');
 
                         if ($orderTypeId) {
-                            $q->where(function($query) use ($orderTypeId) {
+                            $q->where(function ($query) use ($orderTypeId) {
                                 $query->where('order_type_id', $orderTypeId);
                             });
                         }
 
                         if ($normalizedDeliveryAppId) {
-                            $q->where(function($query) use ($normalizedDeliveryAppId) {
+                            $q->where(function ($query) use ($normalizedDeliveryAppId) {
                                 $query->where('delivery_app_id', $normalizedDeliveryAppId)
-                                      ->orWhereNull('delivery_app_id');
+                                    ->orWhereNull('delivery_app_id');
                             });
                         } else {
                             $q->whereNull('delivery_app_id');
@@ -818,15 +844,15 @@ class Pos extends Component
                         $q->where('status', true);
 
                         if ($orderTypeId) {
-                            $q->where(function($query) use ($orderTypeId) {
+                            $q->where(function ($query) use ($orderTypeId) {
                                 $query->where('order_type_id', $orderTypeId);
                             });
                         }
 
                         if ($normalizedDeliveryAppId) {
-                            $q->where(function($query) use ($normalizedDeliveryAppId) {
+                            $q->where(function ($query) use ($normalizedDeliveryAppId) {
                                 $query->where('delivery_app_id', $normalizedDeliveryAppId)
-                                      ->orWhereNull('delivery_app_id');
+                                    ->orWhereNull('delivery_app_id');
                             });
                         } else {
                             $q->whereNull('delivery_app_id');
@@ -836,15 +862,15 @@ class Pos extends Component
                         $q->where('status', true);
 
                         if ($orderTypeId) {
-                            $q->where(function($query) use ($orderTypeId) {
+                            $q->where(function ($query) use ($orderTypeId) {
                                 $query->where('order_type_id', $orderTypeId);
                             });
                         }
 
                         if ($normalizedDeliveryAppId) {
-                            $q->where(function($query) use ($normalizedDeliveryAppId) {
+                            $q->where(function ($query) use ($normalizedDeliveryAppId) {
                                 $query->where('delivery_app_id', $normalizedDeliveryAppId)
-                                      ->orWhereNull('delivery_app_id');
+                                    ->orWhereNull('delivery_app_id');
                             });
                         } else {
                             $q->whereNull('delivery_app_id');
@@ -1075,15 +1101,15 @@ class Pos extends Component
 
         // Group by table_id and get unique tables, exclude current table if set
         $tableIds = $unpaidOrders->pluck('table_id')->unique()->filter();
-        
+
         $query = Table::whereIn('id', $tableIds)
             ->where('branch_id', branch()->id);
-        
+
         // Exclude current table if it's set
         if ($this->tableId) {
             $query->where('id', '!=', $this->tableId);
         }
-        
+
         $this->tablesWithUnpaidOrders = $query
             ->with(['activeOrder.items.menuItem', 'activeOrder.items.menuItemVariation', 'activeOrder.items.modifierOptions', 'activeOrder.kot.items.menuItem', 'activeOrder.kot.items.menuItemVariation', 'activeOrder.kot.items.modifierOptions'])
             ->orderBy('table_code')
@@ -1134,7 +1160,7 @@ class Pos extends Component
             }
 
             $orderIds = $ordersToDelete->pluck('id')->toArray();
-            
+
             // Collect KOT IDs from loaded relationships
             $kotIds = $ordersToDelete->flatMap(function ($order) {
                 return $order->kot->pluck('id');
@@ -1160,7 +1186,7 @@ class Pos extends Component
             // Update table statuses and unlock tables
             if (!empty($tableIds)) {
                 Table::whereIn('id', $tableIds)->update(['available_status' => 'available']);
-                
+
                 // Unlock tables
                 foreach ($tableIds as $tableId) {
                     $table = Table::find($tableId);
@@ -1253,7 +1279,7 @@ class Pos extends Component
 
         // Close modal and show success message
         $this->closeMergeTableModal();
-        
+
         $this->alert('success', __('Tables merged successfully'), [
             'toast' => true,
             'position' => 'top-end',
@@ -1278,7 +1304,7 @@ class Pos extends Component
         $baseKey = '"merged_order_' . $orderItem->id . '"';
         $key = $baseKey;
         $counter = 1;
-        
+
         // Ensure key is unique
         while (isset($this->orderItemList[$key])) {
             $key = $baseKey . '_' . $counter;
@@ -1289,7 +1315,7 @@ class Pos extends Component
         $this->orderItemQty[$key] = $orderItem->quantity;
         $this->itemModifiersSelected[$key] = $orderItem->modifierOptions->pluck('id')->toArray();
         $this->orderItemModifiersPrice[$key] = $orderItem->modifierOptions->sum('price');
-        
+
         $basePrice = $orderItem->menuItemVariation ? $orderItem->menuItemVariation->price : $orderItem->menuItem->price;
         $this->orderItemAmount[$key] = $this->orderItemQty[$key] * ($basePrice + ($this->orderItemModifiersPrice[$key] ?? 0));
 
@@ -1300,7 +1326,7 @@ class Pos extends Component
         if ($orderItem->note) {
             $this->itemNotes[$key] = $orderItem->note;
         }
-        
+
         return $key; // Return the cart key for tracking
     }
 
@@ -1321,7 +1347,7 @@ class Pos extends Component
         $baseKey = '"merged_kot_' . $kotItem->kot_id . '_' . $kotItem->id . '"';
         $key = $baseKey;
         $counter = 1;
-        
+
         // Ensure key is unique
         while (isset($this->orderItemList[$key])) {
             $key = $baseKey . '_' . $counter;
@@ -1332,7 +1358,7 @@ class Pos extends Component
         $this->orderItemQty[$key] = $kotItem->quantity;
         $this->itemModifiersSelected[$key] = $kotItem->modifierOptions->pluck('id')->toArray();
         $this->orderItemModifiersPrice[$key] = $kotItem->modifierOptions->sum('price');
-        
+
         $basePrice = $kotItem->menuItemVariation ? $kotItem->menuItemVariation->price : $kotItem->menuItem->price;
         $this->orderItemAmount[$key] = $this->orderItemQty[$key] * ($basePrice + ($this->orderItemModifiersPrice[$key] ?? 0));
 
@@ -1982,7 +2008,7 @@ class Pos extends Component
             if ($action !== 'draft') {
                 $orderNumberData = Order::generateOrderNumber(branch());
             }
-            
+
             $table = Table::find($this->tableId);
             $reservationId = $table?->activeReservation?->id;
 
@@ -2030,7 +2056,7 @@ class Pos extends Component
             }
 
             $order = Order::create($orderData);
-            
+
             if (!empty($this->extraCharges)) {
                 $chargesData = collect($this->extraCharges)
                     ->map(fn($charge) => [
@@ -2054,16 +2080,16 @@ class Pos extends Component
             }
 
             $order = ($this->tableOrderID ? $this->tableOrder->activeOrder : $this->orderDetail);
-            
+
             // Store original status before update to check if converting from draft
             $wasDraft = $order->status === 'draft';
-            
+
             // If converting from draft to KOT/Bill, generate order number
             $orderNumberData = null;
             if ($wasDraft && $action !== 'draft' && !$order->order_number) {
                 $orderNumberData = Order::generateOrderNumber(branch());
             }
-            
+
             $updateData = [
                 'date_time' => now(),
                 'order_type' => $this->orderType,
@@ -2085,7 +2111,7 @@ class Pos extends Component
                 'discount_value' => $this->discountValue,
                 'discount_amount' => $this->discountAmount,
             ];
-            
+
             // Add order number if converting from draft
             if ($orderNumberData) {
                 $updateData['order_number'] = $orderNumberData['order_number'];
@@ -2100,16 +2126,16 @@ class Pos extends Component
             }
 
             Order::where('id', $order->id)->update($updateData);
-            
+
             // Refresh order to get updated data
             $order->refresh();
-            
+
             // Update component properties with refreshed order data (especially order number)
             if ($orderNumberData) {
                 $this->orderNumber = $order->order_number;
                 $this->formattedOrderNumber = $order->formatted_order_number;
             }
-            
+
             // Update orderDetail if it exists
             if ($this->orderDetail && $this->orderDetail->id == $order->id) {
                 $this->orderDetail = $order;
@@ -2194,7 +2220,7 @@ class Pos extends Component
                 Table::where('id', $this->tableId)->update([
                     'available_status' => $tableStatus
                 ]);
-                
+
                 // Unlock the table for draft orders
                 $table = Table::find($this->tableId);
                 if ($table) {
@@ -3074,15 +3100,15 @@ class Pos extends Component
                                 ->whereNull('menu_item_variation_id'); // Only item-level prices
 
                             if ($orderTypeId) {
-                                $q->where(function($query) use ($orderTypeId) {
+                                $q->where(function ($query) use ($orderTypeId) {
                                     $query->where('order_type_id', $orderTypeId);
                                 });
                             }
 
                             if ($normalizedDeliveryAppId) {
-                                $q->where(function($query) use ($normalizedDeliveryAppId) {
+                                $q->where(function ($query) use ($normalizedDeliveryAppId) {
                                     $query->where('delivery_app_id', $normalizedDeliveryAppId)
-                                          ->orWhereNull('delivery_app_id');
+                                        ->orWhereNull('delivery_app_id');
                                 });
                             } else {
                                 $q->whereNull('delivery_app_id');
@@ -3093,15 +3119,15 @@ class Pos extends Component
                             $q->where('status', true);
 
                             if ($orderTypeId) {
-                                $q->where(function($query) use ($orderTypeId) {
+                                $q->where(function ($query) use ($orderTypeId) {
                                     $query->where('order_type_id', $orderTypeId);
                                 });
                             }
 
                             if ($normalizedDeliveryAppId) {
-                                $q->where(function($query) use ($normalizedDeliveryAppId) {
+                                $q->where(function ($query) use ($normalizedDeliveryAppId) {
                                     $query->where('delivery_app_id', $normalizedDeliveryAppId)
-                                          ->orWhereNull('delivery_app_id');
+                                        ->orWhereNull('delivery_app_id');
                                 });
                             } else {
                                 $q->whereNull('delivery_app_id');
@@ -3112,15 +3138,15 @@ class Pos extends Component
                             $q->where('status', true);
 
                             if ($orderTypeId) {
-                                $q->where(function($query) use ($orderTypeId) {
+                                $q->where(function ($query) use ($orderTypeId) {
                                     $query->where('order_type_id', $orderTypeId);
                                 });
                             }
 
                             if ($normalizedDeliveryAppId) {
-                                $q->where(function($query) use ($normalizedDeliveryAppId) {
+                                $q->where(function ($query) use ($normalizedDeliveryAppId) {
                                     $query->where('delivery_app_id', $normalizedDeliveryAppId)
-                                          ->orWhereNull('delivery_app_id');
+                                        ->orWhereNull('delivery_app_id');
                                 });
                             } else {
                                 $q->whereNull('delivery_app_id');
