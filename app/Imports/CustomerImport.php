@@ -51,11 +51,11 @@ class CustomerImport implements ToCollection, WithHeadingRow, WithChunkReading, 
 
                 // Check for duplicate customer by phone or email
                 $existingCustomer = Customer::where('restaurant_id', $this->restaurantId)
-                                            ->where(function($query) use ($rowData) {
-                                                $query->where('phone', $rowData['phone'] ?? null)
-                                                    ->orWhere('email', $rowData['email'] ?? null);
-                                            })
-                                            ->first();
+                    ->where(function ($query) use ($rowData) {
+                        $query->where('phone', $rowData['phone'] ?? null)
+                            ->orWhere('email', $rowData['email'] ?? null);
+                    })
+                    ->first();
 
                 // If customer already exists, skip this row and continue
                 if ($existingCustomer) {
@@ -86,7 +86,6 @@ class CustomerImport implements ToCollection, WithHeadingRow, WithChunkReading, 
                     'phone' => $rowData['phone'] ?? 'N/A',
                     'email' => $rowData['email'] ?? 'N/A'
                 ]);
-
             } catch (\Exception $e) {
                 $this->skippedCount++;
                 Log::error('Failed to import customer', [
@@ -121,11 +120,4 @@ class CustomerImport implements ToCollection, WithHeadingRow, WithChunkReading, 
     {
         return $this->skippedCount;
     }
-
 }
-
-
-
-
-
-

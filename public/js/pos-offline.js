@@ -54,3 +54,29 @@ document.addEventListener('livewire:load', function () {
         }
     });
 });
+
+
+const handleOfflineSaveOrder = (orderType) => {
+    const orderData = {
+        order_number: generateOfflineOrderNumber(),
+        items: orderItemList, // from your Livewire state or JS
+        discounts: discountAmount,
+        taxes: taxes,
+        extra_charges: extraCharges,
+        deliveryFee: deliveryFee,
+        total: total,
+        customer: customerData,
+        table: currentTable,
+        orderType,
+        timestamp: new Date().toISOString(),
+        status: 'offline', // mark as offline
+    };
+
+    // Save to localStorage (or IndexedDB for larger data)
+    const offlineOrders = JSON.parse(localStorage.getItem("pos_offline_orders") || "[]");
+    offlineOrders.push(orderData);
+    localStorage.setItem("pos_offline_orders", JSON.stringify(offlineOrders));
+
+    // Generate and print invoice immediately
+    printInvoice(orderData);
+};

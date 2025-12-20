@@ -1,118 +1,56 @@
 <template>
     <div>
         <!-- Offline Indicator -->
-        <OfflineIndicator
-            :is-online="isOnline"
-            :pending-operations="pendingOperations"
-            @clear-cache="handleShowClearCacheModal"
-        />
+        <OfflineIndicator :is-online="isOnline" :pending-operations="pendingOperations"
+            @clear-cache="handleShowClearCacheModal" />
 
         <div class="flex-grow lg:flex h-auto pt-6">
             <!-- Menu Panel -->
-            <MenuPanel
-                :search="search"
-                :menu-id="menuId"
-                :filter-categories="filterCategories"
-                :menus="menus"
-                :categories="categories"
-                :items="menuItems"
-                :currency-symbol="currencySymbol"
-                @update:search="search = $event"
-                @update:menuId="menuId = $event"
-                @update:filterCategories="filterCategories = $event"
-                @add-to-cart="handleAddToCart"
-                @reset="handleReset"
-            />
+            <MenuPanel :search="search" :menu-id="menuId" :filter-categories="filterCategories" :menus="menus"
+                :categories="categories" :items="menuItems" :currency-symbol="currencySymbol"
+                @update:search="search = $event" @update:menuId="menuId = $event"
+                @update:filterCategories="filterCategories = $event" @add-to-cart="handleAddToCart"
+                @reset="handleReset" />
 
             <!-- Order Panel -->
-            <OrderPanel
-                :order-type="orderType"
-                :order-number="orderNumber"
-                :current-table="currentTable"
-                :pax="pax"
-                :waiter-id="waiterId"
-                :waiters="waiters"
-                :cart-items="cartItems"
-                :taxes="taxes"
-                :saving="saving"
-                :extra-charges="extraCharges"
-                :discount-amount="discountAmount"
-                :discount-type="discountType"
-                :discount-value="discountValue"
-                :is-online="isOnline"
-                :total-tax-amount="totalTaxAmount"
-                :is-inclusive="false"
-                :currency-symbol="currencySymbol"
-                @update:orderType="orderType = $event"
-                @show-add-customer="showAddCustomerModal = true"
-                @select-table="handleSelectTable"
-                @update:pax="pax = $event"
-                @update:waiterId="waiterId = $event"
-                @add-note="handleAddNote"
-                @increase-quantity="handleIncreaseQuantity"
-                @decrease-quantity="handleDecreaseQuantity"
-                @remove-item="handleRemoveItem"
-                @save-order="handleSaveOrder"
-                @update:extraCharges="extraCharges = $event"
-                @apply-discount="handleApplyDiscount"
-                @remove-discount="handleRemoveDiscount"
-                :order="order"
-            />
+            <OrderPanel :order-type="orderType" :order-number="orderNumber" :current-table="currentTable" :pax="pax"
+                :waiter-id="waiterId" :waiters="waiters" :cart-items="cartItems" :taxes="taxes" :saving="saving"
+                :extra-charges="extraCharges" :discount-amount="discountAmount" :discount-type="discountType"
+                :discount-value="discountValue" :is-online="isOnline" :total-tax-amount="totalTaxAmount"
+                :is-inclusive="false" :currency-symbol="currencySymbol" @update:orderType="orderType = $event"
+                @show-add-customer="showAddCustomerModal = true" @select-table="handleSelectTable"
+                @update:pax="pax = $event" @update:waiterId="waiterId = $event" @add-note="handleAddNote"
+                @increase-quantity="handleIncreaseQuantity" @decrease-quantity="handleDecreaseQuantity"
+                @remove-item="handleRemoveItem" @save-order="handleSaveOrder"
+                @update:extraCharges="extraCharges = $event" @apply-discount="handleApplyDiscount"
+                @remove-discount="handleRemoveDiscount" :order="order" />
         </div>
 
         <!-- Modals -->
-        <ReservationModal
-            :show="showReservationModal"
-            :reservation="reservation"
-            @close="showReservationModal = false"
-            @confirm-same="handleConfirmSameCustomer"
-            @confirm-different="handleConfirmDifferentCustomer"
-        />
+        <ReservationModal :show="showReservationModal" :reservation="reservation" @close="showReservationModal = false"
+            @confirm-same="handleConfirmSameCustomer" @confirm-different="handleConfirmDifferentCustomer" />
 
-        <TableChangeModal
-            :show="showTableChangeConfirmationModal"
-            :current-table="currentTable"
-            :new-table="newTable"
-            @close="showTableChangeConfirmationModal = false"
-            @confirm="handleConfirmTableChange"
-        />
+        <TableChangeModal :show="showTableChangeConfirmationModal" :current-table="currentTable" :new-table="newTable"
+            @close="showTableChangeConfirmationModal = false" @confirm="handleConfirmTableChange" />
 
-        <AddCustomerModal
-            :show="showAddCustomerModal"
-            :customer="customer"
-            @close="showAddCustomerModal = false"
-            @save="handleSaveCustomer"
-        />
+        <AddCustomerModal :show="showAddCustomerModal" :customer="customer" @close="showAddCustomerModal = false"
+            @save="handleSaveCustomer" />
 
-        <AddNoteModal
-            :show="showAddNoteModal"
-            :note="orderNote"
-            @close="showAddNoteModal = false"
-            @save="handleSaveNote"
-        />
+        <AddNoteModal :show="showAddNoteModal" :note="orderNote" @close="showAddNoteModal = false"
+            @save="handleSaveNote" />
 
         <!-- Clear Cache Confirmation Modal -->
-        <div
-            v-if="showClearCacheModal"
-            class="fixed inset-0 overflow-y-auto px-4 py-6 sm:px-0 z-50"
-            @click.self="showClearCacheModal = false"
-        >
+        <div v-if="showClearCacheModal" class="fixed inset-0 overflow-y-auto px-4 py-6 sm:px-0 z-50"
+            @click.self="showClearCacheModal = false">
             <!-- Backdrop -->
-            <div
-                class="fixed inset-0 transform transition-all bg-gray-500 dark:bg-gray-900 opacity-75"
-                @click="showClearCacheModal = false"
-            ></div>
+            <div class="fixed inset-0 transform transition-all bg-gray-500 dark:bg-gray-900 opacity-75"
+                @click="showClearCacheModal = false"></div>
 
             <!-- Modal Content -->
             <div
-                class="mb-6 bg-white dark:bg-gray-900 rounded-lg overflow-hidden shadow-xl transform transition-all sm:w-full sm:max-w-md sm:mx-auto"
-            >
-                <div
-                    class="px-6 py-4 border-b border-gray-200 dark:border-gray-700"
-                >
-                    <h3
-                        class="text-lg font-medium text-gray-900 dark:text-white"
-                    >
+                class="mb-6 bg-white dark:bg-gray-900 rounded-lg overflow-hidden shadow-xl transform transition-all sm:w-full sm:max-w-md sm:mx-auto">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">
                         Clear Cache
                     </h3>
                 </div>
@@ -121,9 +59,7 @@
                         Are you sure you want to clear all cached menu data and
                         reset the order panel? This will:
                     </p>
-                    <ul
-                        class="list-disc list-inside text-sm text-gray-600 dark:text-gray-400 mb-4 space-y-1"
-                    >
+                    <ul class="list-disc list-inside text-sm text-gray-600 dark:text-gray-400 mb-4 space-y-1">
                         <li>
                             Clear local cache ({{
                                 cacheInfo?.menus || 0
@@ -144,30 +80,21 @@
                         and order data will be reset. Data will be refreshed
                         from the server.
                     </p>
-                    <div
-                        v-if="!isOnline"
-                        class="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md"
-                    >
+                    <div v-if="!isOnline"
+                        class="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md">
                         <p class="text-xs text-yellow-800 dark:text-yellow-200">
                             ⚠️ You are currently offline. This feature only
                             works when online.
                         </p>
                     </div>
                 </div>
-                <div
-                    class="px-6 py-4 bg-gray-100 dark:bg-gray-800 flex justify-end gap-3"
-                >
-                    <button
-                        @click="showClearCacheModal = false"
-                        class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-                    >
+                <div class="px-6 py-4 bg-gray-100 dark:bg-gray-800 flex justify-end gap-3">
+                    <button @click="showClearCacheModal = false"
+                        class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
                         Cancel
                     </button>
-                    <button
-                        @click="handleClearCache"
-                        :disabled="!isOnline"
-                        class="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
+                    <button @click="handleClearCache" :disabled="!isOnline"
+                        class="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed">
                         Clear Cache
                     </button>
                 </div>
@@ -485,6 +412,17 @@ const calculateTaxes = () => {
 
     taxes.value = calculatedTaxes;
 };
+
+watch(isOnline, (newVal) => {
+    if (newVal) {
+        // refresh menu data
+        loadMenuData();
+        // sync pending operations
+        if (pendingOperations.value.length > 0) {
+            syncPendingOperations(syncHandler);
+        }
+    }
+});
 
 // Recalculate percentage discount when cart items change
 watch(
@@ -1126,17 +1064,6 @@ onMounted(async () => {
     }
 });
 
-// Reload menu data when coming back online
-watch(isOnline, (newVal) => {
-    if (newVal) {
-        // When coming back online, refresh menu data
-        loadMenuData();
-        // Also sync pending operations
-        if (pendingOperations.value.length > 0) {
-            syncPendingOperations(syncHandler);
-        }
-    }
-});
 </script>
 
 <style scoped></style>

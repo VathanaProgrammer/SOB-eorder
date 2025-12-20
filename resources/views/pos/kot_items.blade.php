@@ -2,60 +2,71 @@
     class="lg:w-6/12 flex flex-col bg-white border-l dark:border-gray-700 min-h-screen h-auto pr-4 px-2 py-4 dark:bg-gray-800 relative">
 
     {{-- Order Type Indicator --}}
-    @if($orderTypeId)
-    <div class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 pb-2 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-            <span class="text-xs text-gray-500 dark:text-gray-400">@lang('modules.settings.orderType'):</span>
-            <span class="text-sm font-semibold text-gray-900 dark:text-white">
-                {{ \App\Models\OrderType::find($orderTypeId)?->order_type_name ?? ucfirst($orderType) }}
-            </span>
-
-            @if($orderTypeSlug === 'delivery' && $selectedDeliveryApp)
-                <span class="text-xs text-gray-500 dark:text-gray-400 mx-2">•</span>
-                <span class="text-xs text-gray-500 dark:text-gray-400">Platform:</span>
-                <span class="text-sm font-medium text-gray-900 dark:text-white">
-                    @if($selectedDeliveryApp === 'default')
-                        Default
-                    @else
-                        {{ \App\Models\DeliveryPlatform::find($selectedDeliveryApp)?->name ?? 'Unknown' }}
-                    @endif
+    @if ($orderTypeId)
+        <div
+            class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 pb-2 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <span class="text-xs text-gray-500 dark:text-gray-400">@lang('modules.settings.orderType'):</span>
+                <span class="text-sm font-semibold text-gray-900 dark:text-white">
+                    {{ \App\Models\OrderType::find($orderTypeId)?->order_type_name ?? ucfirst($orderType) }}
                 </span>
-            @endif
-        </div>
 
-        <button type="button" wire:click="changeOrderType" class="text-xs bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-3 py-2 rounded-full transition-all">
-            Change
-        </button>
-    </div>
+                @if ($orderTypeSlug === 'delivery' && $selectedDeliveryApp)
+                    <span class="text-xs text-gray-500 dark:text-gray-400 mx-2">•</span>
+                    <span class="text-xs text-gray-500 dark:text-gray-400">Platform:</span>
+                    <span class="text-sm font-medium text-gray-900 dark:text-white">
+                        @if ($selectedDeliveryApp === 'default')
+                            Default
+                        @else
+                            {{ \App\Models\DeliveryPlatform::find($selectedDeliveryApp)?->name ?? 'Unknown' }}
+                        @endif
+                    </span>
+                @endif
+            </div>
+
+            <button type="button" wire:click="changeOrderType"
+                class="text-xs bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-3 py-2 rounded-full transition-all">
+                Change
+            </button>
+        </div>
     @endif
 
     <div class="flex-1 overflow-y-auto overflow-x-hidden space-y-2 pr-1 pb-36">
         <div class="mt-2">
-            @if($customerId)
+            @if ($customerId)
                 <div class="flex items-center gap-2">
                     <div class="font-semibold text-gray-700 dark:text-gray-300">{{ $customer->name }}</div>
-                    @if(user_can('Update Order'))
-                        <button  wire:click="$dispatch('showAddCustomerModal', { customerId: {{ $customerId }} })" title="{{__('modules.order.updateCustomerDetails')}}" class="p-1 text-gray-500 transition-colors bg-gray-100 rounded-md hover:text-gray-700 hover:bg-gray-200 rtl:ml-2 ltr:mr-2 dark:text-gray-300 dark:bg-gray-600 dark:hover:text-gray-200 dark:hover:bg-gray-700">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
-                                <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
-                                <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
+                    @if (user_can('Update Order'))
+                        <button wire:click="$dispatch('showAddCustomerModal', { customerId: {{ $customerId }} })"
+                            title="{{ __('modules.order.updateCustomerDetails') }}"
+                            class="p-1 text-gray-500 transition-colors bg-gray-100 rounded-md hover:text-gray-700 hover:bg-gray-200 rtl:ml-2 ltr:mr-2 dark:text-gray-300 dark:bg-gray-600 dark:hover:text-gray-200 dark:hover:bg-gray-700">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="bi bi-pencil-square" viewBox="0 0 16 16">
+                                <path
+                                    d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+                                <path fill-rule="evenodd"
+                                    d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z" />
                             </svg>
                         </button>
                     @endif
                 </div>
-
             @else
-                <a href="javascript:;"
-                    wire:click="$dispatch('showAddCustomerModal')"
+                <a href="javascript:;" wire:click="$dispatch('showAddCustomerModal')"
                     class="text-sm underline underline-offset-2 dark:text-gray-300">&plus; @lang('modules.order.addCustomerDetails')</a>
             @endif
         </div>
 
         <div class="flex justify-between my-2 items-center">
             <div class="font-medium py-2 inline-flex items-center gap-1  dark:text-neutral-200 text-sm">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-receipt w-4 h-4" viewBox="0 0 16 16"><path d="M1.92.506a.5.5 0 0 1 .434.14L3 1.293l.646-.647a.5.5 0 0 1 .708 0L5 1.293l.646-.647a.5.5 0 0 1 .708 0L7 1.293l.646-.647a.5.5 0 0 1 .708 0L9 1.293l.646-.647a.5.5 0 0 1 .708 0l.646.647.646-.647a.5.5 0 0 1 .708 0l.646.647.646-.647a.5.5 0 0 1 .801.13l.5 1A.5.5 0 0 1 15 2v12a.5.5 0 0 1-.053.224l-.5 1a.5.5 0 0 1-.8.13L13 14.707l-.646.647a.5.5 0 0 1-.708 0L11 14.707l-.646.647a.5.5 0 0 1-.708 0L9 14.707l-.646.647a.5.5 0 0 1-.708 0L7 14.707l-.646.647a.5.5 0 0 1-.708 0L5 14.707l-.646.647a.5.5 0 0 1-.708 0L3 14.707l-.646.647a.5.5 0 0 1-.801-.13l-.5-1A.5.5 0 0 1 1 14V2a.5.5 0 0 1 .053-.224l.5-1a.5.5 0 0 1 .367-.27m.217 1.338L2 2.118v11.764l.137.274.51-.51a.5.5 0 0 1 .707 0l.646.647.646-.646a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .708 0l.509.509.137-.274V2.118l-.137-.274-.51.51a.5.5 0 0 1-.707 0L12 1.707l-.646.647a.5.5 0 0 1-.708 0L10 1.707l-.646.647a.5.5 0 0 1-.708 0L8 1.707l-.646.647a.5.5 0 0 1-.708 0L6 1.707l-.646.647a.5.5 0 0 1-.708 0L4 1.707l-.646.647a.5.5 0 0 1-.708 0z"/><path d="M3 4.5a.5.5 0 0 1 .5-.5h6a.5.5 0 1 1 0 1h-6a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 1 1 0 1h-6a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 1 1 0 1h-6a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5m8-6a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                    class="bi bi-receipt w-4 h-4" viewBox="0 0 16 16">
+                    <path
+                        d="M1.92.506a.5.5 0 0 1 .434.14L3 1.293l.646-.647a.5.5 0 0 1 .708 0L5 1.293l.646-.647a.5.5 0 0 1 .708 0L7 1.293l.646-.647a.5.5 0 0 1 .708 0L9 1.293l.646-.647a.5.5 0 0 1 .708 0l.646.647.646-.647a.5.5 0 0 1 .708 0l.646.647.646-.647a.5.5 0 0 1 .801.13l.5 1A.5.5 0 0 1 15 2v12a.5.5 0 0 1-.053.224l-.5 1a.5.5 0 0 1-.8.13L13 14.707l-.646.647a.5.5 0 0 1-.708 0L11 14.707l-.646.647a.5.5 0 0 1-.708 0L9 14.707l-.646.647a.5.5 0 0 1-.708 0L7 14.707l-.646.647a.5.5 0 0 1-.708 0L5 14.707l-.646.647a.5.5 0 0 1-.708 0L3 14.707l-.646.647a.5.5 0 0 1-.801-.13l-.5-1A.5.5 0 0 1 1 14V2a.5.5 0 0 1 .053-.224l.5-1a.5.5 0 0 1 .367-.27m.217 1.338L2 2.118v11.764l.137.274.51-.51a.5.5 0 0 1 .707 0l.646.647.646-.646a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .708 0l.509.509.137-.274V2.118l-.137-.274-.51.51a.5.5 0 0 1-.707 0L12 1.707l-.646.647a.5.5 0 0 1-.708 0L10 1.707l-.646.647a.5.5 0 0 1-.708 0L8 1.707l-.646.647a.5.5 0 0 1-.708 0L6 1.707l-.646.647a.5.5 0 0 1-.708 0L4 1.707l-.646.647a.5.5 0 0 1-.708 0z" />
+                    <path
+                        d="M3 4.5a.5.5 0 0 1 .5-.5h6a.5.5 0 1 1 0 1h-6a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 1 1 0 1h-6a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 1 1 0 1h-6a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5m8-6a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5" />
+                </svg>
 
-                @if(!isOrderPrefixEnabled())
+                @if (!isOrderPrefixEnabled())
                     @lang('modules.order.orderNumber') #{{ $orderNumber }}
                 @else
                     {{ $formattedOrderNumber }}
@@ -66,10 +77,19 @@
             @if ($orderType == 'dine_in')
                 <div class="inline-flex items-center gap-2 dark:text-gray-300">
                     @if (!is_null($tableNo))
-                        <svg fill="currentColor" class="w-5 h-5 transition duration-75 group-hover:text-gray-900 dark:text-gray-200 dark:group-hover:text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44.999 44.999" xml:space="preserve"><g stroke-width="0"/><g stroke-linecap="round" stroke-linejoin="round"/><path d="m42.558 23.378 2.406-10.92a1.512 1.512 0 0 0-2.954-.652l-2.145 9.733h-9.647a1.512 1.512 0 0 0 0 3.026h.573l-3.258 7.713a1.51 1.51 0 0 0 1.393 2.102c.59 0 1.15-.348 1.394-.925l2.974-7.038 4.717.001 2.971 7.037a1.512 1.512 0 1 0 2.787-1.177l-3.257-7.713h.573a1.51 1.51 0 0 0 1.473-1.187m-28.35 1.186h.573a1.512 1.512 0 0 0 0-3.026H5.134L2.99 11.806a1.511 1.511 0 1 0-2.954.652l2.406 10.92a1.51 1.51 0 0 0 1.477 1.187h.573L1.234 32.28a1.51 1.51 0 0 0 .805 1.98 1.515 1.515 0 0 0 1.982-.805l2.971-7.037 4.717-.001 2.972 7.038a1.514 1.514 0 0 0 1.982.805 1.51 1.51 0 0 0 .805-1.98z"/><path d="M24.862 31.353h-.852V18.308h8.13a1.513 1.513 0 1 0 0-3.025H12.856a1.514 1.514 0 0 0 0 3.025h8.13v13.045h-.852a1.514 1.514 0 0 0 0 3.027h4.728a1.513 1.513 0 1 0 0-3.027"/></svg>
+                        <svg fill="currentColor"
+                            class="w-5 h-5 transition duration-75 group-hover:text-gray-900 dark:text-gray-200 dark:group-hover:text-white"
+                            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44.999 44.999" xml:space="preserve">
+                            <g stroke-width="0" />
+                            <g stroke-linecap="round" stroke-linejoin="round" />
+                            <path
+                                d="m42.558 23.378 2.406-10.92a1.512 1.512 0 0 0-2.954-.652l-2.145 9.733h-9.647a1.512 1.512 0 0 0 0 3.026h.573l-3.258 7.713a1.51 1.51 0 0 0 1.393 2.102c.59 0 1.15-.348 1.394-.925l2.974-7.038 4.717.001 2.971 7.037a1.512 1.512 0 1 0 2.787-1.177l-3.257-7.713h.573a1.51 1.51 0 0 0 1.473-1.187m-28.35 1.186h.573a1.512 1.512 0 0 0 0-3.026H5.134L2.99 11.806a1.511 1.511 0 1 0-2.954.652l2.406 10.92a1.51 1.51 0 0 0 1.477 1.187h.573L1.234 32.28a1.51 1.51 0 0 0 .805 1.98 1.515 1.515 0 0 0 1.982-.805l2.971-7.037 4.717-.001 2.972 7.038a1.514 1.514 0 0 0 1.982.805 1.51 1.51 0 0 0 .805-1.98z" />
+                            <path
+                                d="M24.862 31.353h-.852V18.308h8.13a1.513 1.513 0 1 0 0-3.025H12.856a1.514 1.514 0 0 0 0 3.025h8.13v13.045h-.852a1.514 1.514 0 0 0 0 3.027h4.728a1.513 1.513 0 1 0 0-3.027" />
+                        </svg>
                         {{ $tableNo }}
 
-                        <x-secondary-button wire:click="openTableChangeConfirmation" >
+                        <x-secondary-button wire:click="openTableChangeConfirmation">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                                 class="bi bi-gear" viewBox="0 0 16 16">
                                 <path
@@ -79,17 +99,21 @@
                             </svg>
                         </x-secondary-button>
                         <x-secondary-button wire:click="openMergeTableModal" class="ml-2" title="Merge Table">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left-right" viewBox="0 0 16 16">
-                                <path fill-rule="evenodd" d="M1 11.5a.5.5 0 0 0 .5.5h11.793l-3.147 3.146a.5.5 0 0 0 .708.708l4-4a.5.5 0 0 0 0-.708l-4-4a.5.5 0 0 0-.708.708L13.293 11H1.5a.5.5 0 0 0-.5.5zm14-7a.5.5 0 0 1-.5.5H2.707l3.147 3.146a.5.5 0 1 1-.708.708l-4-4a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 4H14.5a.5.5 0 0 1 .5.5z"/>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="bi bi-arrow-left-right" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd"
+                                    d="M1 11.5a.5.5 0 0 0 .5.5h11.793l-3.147 3.146a.5.5 0 0 0 .708.708l4-4a.5.5 0 0 0 0-.708l-4-4a.5.5 0 0 0-.708.708L13.293 11H1.5a.5.5 0 0 0-.5.5zm14-7a.5.5 0 0 1-.5.5H2.707l3.147 3.146a.5.5 0 1 1-.708.708l-4-4a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 4H14.5a.5.5 0 0 1 .5.5z" />
                             </svg>
                             @lang('modules.order.mergeTables')
                         </x-secondary-button>
                     @else
                         <x-secondary-button class="text-xs"
-                            wire:click="openTableChangeConfirmation" >@lang('modules.order.setTable')</x-secondary-button>
+                            wire:click="openTableChangeConfirmation">@lang('modules.order.setTable')</x-secondary-button>
                         <x-secondary-button wire:click="openMergeTableModal" class="ml-2" title="Merge Table">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left-right" viewBox="0 0 16 16">
-                                <path fill-rule="evenodd" d="M1 11.5a.5.5 0 0 0 .5.5h11.793l-3.147 3.146a.5.5 0 0 0 .708.708l4-4a.5.5 0 0 0 0-.708l-4-4a.5.5 0 0 0-.708.708L13.293 11H1.5a.5.5 0 0 0-.5.5zm14-7a.5.5 0 0 1-.5.5H2.707l3.147 3.146a.5.5 0 1 1-.708.708l-4-4a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 4H14.5a.5.5 0 0 1 .5.5z"/>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="bi bi-arrow-left-right" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd"
+                                    d="M1 11.5a.5.5 0 0 0 .5.5h11.793l-3.147 3.146a.5.5 0 0 0 .708.708l4-4a.5.5 0 0 0 0-.708l-4-4a.5.5 0 0 0-.708.708L13.293 11H1.5a.5.5 0 0 0-.5.5zm14-7a.5.5 0 0 1-.5.5H2.707l3.147 3.146a.5.5 0 1 1-.708.708l-4-4a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 4H14.5a.5.5 0 0 1 .5.5z" />
                             </svg>
                             @lang('modules.order.mergeTables')
                         </x-secondary-button>
@@ -134,26 +158,26 @@
 
                     <div class="inline-flex items-center gap-2">
                         <svg width="16" height="16" fill="currentColor" viewBox="0 -2.89 122.88 122.88"
-                        version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
-                        xmlns:xlink="http://www.w3.org/1999/xlink" style="enable-background:new 0 0 122.88 117.09"
-                        xml:space="preserve">
-                        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                        <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-                        <g id="SVGRepo_iconCarrier">
-                            <style type="text/css">
-                                .st0 {
-                                    fill-rule: evenodd;
-                                    clip-rule: evenodd;
-                                }
-                            </style>
-                            <g>
-                                <path class="st0"
-                                    d="M36.82,107.86L35.65,78.4l13.25-0.53c5.66,0.78,11.39,3.61,17.15,6.92l10.29-0.41c4.67,0.1,7.3,4.72,2.89,8 c-3.5,2.79-8.27,2.83-13.17,2.58c-3.37-0.03-3.34,4.5,0.17,4.37c1.22,0.05,2.54-0.29,3.69-0.34c6.09-0.25,11.06-1.61,13.94-6.55 l1.4-3.66l15.01-8.2c7.56-2.83,12.65,4.3,7.23,10.1c-10.77,8.51-21.2,16.27-32.62,22.09c-8.24,5.47-16.7,5.64-25.34,1.01 L36.82,107.86L36.82,107.86z M29.74,62.97h91.9c0.68,0,1.24,0.57,1.24,1.24v5.41c0,0.67-0.56,1.24-1.24,1.24h-91.9 c-0.68,0-1.24-0.56-1.24-1.24v-5.41C28.5,63.53,29.06,62.97,29.74,62.97L29.74,62.97z M79.26,11.23 c25.16,2.01,46.35,23.16,43.22,48.06l-93.57,0C25.82,34.23,47.09,13.05,72.43,11.2V7.14l-4,0c-0.7,0-1.28-0.58-1.28-1.28V1.28 c0-0.7,0.57-1.28,1.28-1.28h14.72c0.7,0,1.28,0.58,1.28,1.28v4.58c0,0.7-0.58,1.28-1.28,1.28h-3.89L79.26,11.23L79.26,11.23 L79.26,11.23z M0,77.39l31.55-1.66l1.4,35.25L1.4,112.63L0,77.39L0,77.39z">
-                                </path>
+                            version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
+                            xmlns:xlink="http://www.w3.org/1999/xlink" style="enable-background:new 0 0 122.88 117.09"
+                            xml:space="preserve">
+                            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                            <g id="SVGRepo_iconCarrier">
+                                <style type="text/css">
+                                    .st0 {
+                                        fill-rule: evenodd;
+                                        clip-rule: evenodd;
+                                    }
+                                </style>
+                                <g>
+                                    <path class="st0"
+                                        d="M36.82,107.86L35.65,78.4l13.25-0.53c5.66,0.78,11.39,3.61,17.15,6.92l10.29-0.41c4.67,0.1,7.3,4.72,2.89,8 c-3.5,2.79-8.27,2.83-13.17,2.58c-3.37-0.03-3.34,4.5,0.17,4.37c1.22,0.05,2.54-0.29,3.69-0.34c6.09-0.25,11.06-1.61,13.94-6.55 l1.4-3.66l15.01-8.2c7.56-2.83,12.65,4.3,7.23,10.1c-10.77,8.51-21.2,16.27-32.62,22.09c-8.24,5.47-16.7,5.64-25.34,1.01 L36.82,107.86L36.82,107.86z M29.74,62.97h91.9c0.68,0,1.24,0.57,1.24,1.24v5.41c0,0.67-0.56,1.24-1.24,1.24h-91.9 c-0.68,0-1.24-0.56-1.24-1.24v-5.41C28.5,63.53,29.06,62.97,29.74,62.97L29.74,62.97z M79.26,11.23 c25.16,2.01,46.35,23.16,43.22,48.06l-93.57,0C25.82,34.23,47.09,13.05,72.43,11.2V7.14l-4,0c-0.7,0-1.28-0.58-1.28-1.28V1.28 c0-0.7,0.57-1.28,1.28-1.28h14.72c0.7,0,1.28,0.58,1.28,1.28v4.58c0,0.7-0.58,1.28-1.28,1.28h-3.89L79.26,11.23L79.26,11.23 L79.26,11.23z M0,77.39l31.55-1.66l1.4,35.25L1.4,112.63L0,77.39L0,77.39z">
+                                    </path>
+                                </g>
                             </g>
-                        </g>
-                    </svg>
-                        
+                        </svg>
+
                         @if (auth()->user()->roles->pluck('display_name')->contains('Waiter'))
                             <span
                                 class="text-xs w-36 px-2 py-1 border border-gray-300 rounded-md bg-gray-100 dark:text-gray-200 dark:bg-gray-600 dark:border-gray-700 truncate"
@@ -202,9 +226,9 @@
                             @lang('modules.order.pickUpDateTime'):
                         </label>
                         <input type="datetime-local" id="delivery_datetime"
-                        class="px-3 py-2 text-sm text-gray-900 bg-gray-100 border border-gray-300 rounded-md dark:border-gray-700 dark:bg-gray-600 dark:text-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        wire:model.live="deliveryDateTime" min="{{ $minDate }}" max="{{ $maxDate }}"
-                        value="{{ $defaultDate }}" style="color-scheme: light dark;" />
+                            class="px-3 py-2 text-sm text-gray-900 bg-gray-100 border border-gray-300 rounded-md dark:border-gray-700 dark:bg-gray-600 dark:text-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            wire:model.live="deliveryDateTime" min="{{ $minDate }}" max="{{ $maxDate }}"
+                            value="{{ $defaultDate }}" style="color-scheme: light dark;" />
                         <x-input-error for="pickupDateTime" class="mt-2" />
 
                     </div>
@@ -215,155 +239,154 @@
 
         <div class="flex flex-col rounded gap-1">
             @forelse ($orderItemList as $key => $item)
-            <div class="border border-gray-100 dark:border-gray-700 rounded-md p-2 flex flex-col gap-2">
-                <div class="flex flex-col gap-1">
-                    <div class="flex items-center justify-between">
-                        <div class="flex flex-col gap-1">
-                            <span class="text-gray-900 dark:text-white text-xs">
-                                {{ $item->item_name }}
-                            </span>
+                <div class="border border-gray-100 dark:border-gray-700 rounded-md p-2 flex flex-col gap-2">
+                    <div class="flex flex-col gap-1">
+                        <div class="flex items-center justify-between">
+                            <div class="flex flex-col gap-1">
+                                <span class="text-gray-900 dark:text-white text-xs">
+                                    {{ $item->item_name }}
+                                </span>
 
-                            @if (isset($orderItemVariation[$key]))
-                            <span class="text-gray-500 dark:text-gray-400 text-xs">
-                                {!! isset($orderItemVariation[$key]) ? '&bull; ' . $orderItemVariation[$key]->variation : '' !!}
-                            </span>
-                            @endif
-                
+                                @if (isset($orderItemVariation[$key]))
+                                    <span class="text-gray-500 dark:text-gray-400 text-xs">
+                                        {!! isset($orderItemVariation[$key]) ? '&bull; ' . $orderItemVariation[$key]->variation : '' !!}
+                                    </span>
+                                @endif
 
-                            @if (!empty($itemModifiersSelected[$key]))
-                                <div class="inline-flex flex-wrap gap-2 text-xs text-gray-600 dark:text-white">
-                                    @foreach ($itemModifiersSelected[$key] as $modifierOptionId)
-                                        <div
-                                            class="inline-flex items-center justify-between text-xs mb-1 py-0.5 px-1 border-l-2 border-blue-500 bg-gray-200 dark:bg-gray-900 rounded-md">
-                                            <span
-                                                class="text-gray-900 dark:text-white">{{ $this->modifierOptions[$modifierOptionId]->name }}</span>
-                                            <span
-                                                class="text-gray-600 dark:text-gray-300">{{ currency_format($this->modifierOptions[$modifierOptionId]->price, $restaurant->currency_id) }}</span>
-                                        </div>
-                                    @endforeach 
+
+                                @if (!empty($itemModifiersSelected[$key]))
+                                    <div class="inline-flex flex-wrap gap-2 text-xs text-gray-600 dark:text-white">
+                                        @foreach ($itemModifiersSelected[$key] as $modifierOptionId)
+                                            <div
+                                                class="inline-flex items-center justify-between text-xs mb-1 py-0.5 px-1 border-l-2 border-blue-500 bg-gray-200 dark:bg-gray-900 rounded-md">
+                                                <span
+                                                    class="text-gray-900 dark:text-white">{{ $this->modifierOptions[$modifierOptionId]->name }}</span>
+                                                <span
+                                                    class="text-gray-600 dark:text-gray-300">{{ currency_format($this->modifierOptions[$modifierOptionId]->price, $restaurant->currency_id) }}</span>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @endif
+                            </div>
+
+                            @php
+                                $displayPrice = $this->getItemDisplayPrice($key);
+                                $totalAmount = $orderItemAmount[$key];
+                            @endphp
+                            <div class="flex items-center gap-2">
+                                <div class="text-gray-500 dark:text-gray-400 text-xs">
+                                    {{ currency_format($displayPrice, restaurant()->currency_id) }}
                                 </div>
-                            @endif
-                        </div>
-
-                        @php
-                            $displayPrice = $this->getItemDisplayPrice($key);
-                            $totalAmount = $orderItemAmount[$key];
-                        @endphp
-                        <div class="flex items-center gap-2">
-                            <div class="text-gray-500 dark:text-gray-400 text-xs">
-                                {{ currency_format($displayPrice, restaurant()->currency_id) }}
-                            </div>
-                            <div class="text-gray-500 dark:text-gray-400 text-xs font-bold">
-                                {{ currency_format($totalAmount, restaurant()->currency_id) }}
+                                <div class="text-gray-500 dark:text-gray-400 text-xs font-bold">
+                                    {{ currency_format($totalAmount, restaurant()->currency_id) }}
+                                </div>
                             </div>
                         </div>
+
+
                     </div>
-                   
+
+                    <div class="flex items-center gap-2 justify-between">
+
+
+                        <div class="relative inline-flex items-center max-w-[7rem]"
+                            wire:key='orderItemQty-{{ $key }}-counter'>
+                            <button type="button" wire:click="subQty('{{ $key }}')"
+                                wire:loading.attr="disabled" wire:loading.class="opacity-50"
+                                class="bg-gray-50 dark:bg-gray-700 dark:hover:bg-gray-600 dark:border-gray-600 hover:bg-gray-200 border border-gray-300 rounded-s-md p-3 h-8 relative">
+                                <svg class="w-2 h-2 text-gray-900 dark:text-white" aria-hidden="true"
+                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 2">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                        stroke-width="2" d="M1 1h16" />
+                                </svg>
+                                {{-- Loading spinner for subQty --}}
+                                <div wire:loading.flex wire:target="subQty('{{ $key }}')"
+                                    class="absolute inset-0 items-center justify-center">
+                                    <svg class="animate-spin h-3 w-3 text-skin-base"
+                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10"
+                                            stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor"
+                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                        </path>
+                                    </svg>
+                                </div>
+                            </button>
+
+                            <input type="text" wire:model.lazy="orderItemQty.{{ $key }}"
+                                wire:change="updateQty('{{ $key }}')"
+                                class="min-w-10 bg-white border-x-0 border-gray-300 h-8 text-center text-gray-900 text-sm block w-full py-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                                min="1" oninput="this.value = this.value.replace(/[^0-9]/g, '')" />
+
+                            <button type="button" wire:click="addQty('{{ $key }}')"
+                                wire:loading.attr="disabled" wire:loading.class="opacity-50"
+                                class="bg-gray-50 dark:bg-gray-700 dark:hover:bg-gray-600 dark:border-gray-600 hover:bg-gray-200 border border-gray-300 rounded-e-md p-3 h-8 relative">
+                                <svg class="w-2 h-2 text-gray-900 dark:text-white" aria-hidden="true"
+                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                        stroke-width="2" d="M9 1v16M1 9h16" />
+                                </svg>
+                                {{-- Loading spinner for addQty --}}
+                                <div wire:loading.flex wire:target="addQty('{{ $key }}')"
+                                    class="absolute inset-0 items-center justify-center">
+                                    <svg class="animate-spin h-3 w-3 text-skin-base"
+                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10"
+                                            stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor"
+                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                        </path>
+                                    </svg>
+                                </div>
+                            </button>
+                        </div>
+
+                        <div>
+                            <x-pos.item-note :id="$key" :note="$itemNotes[$key] ?? ''" />
+                        </div>
+
+                        <div>
+                            <button
+                                class="rounded text-gray-800 dark:text-gray-400 border dark:border-gray-500 hover:bg-gray-200 dark:hover:bg-gray-900/20 p-2 relative"
+                                wire:click="deleteCartItems('{{ $key }}')" wire:loading.attr="disabled"
+                                wire:loading.class="opacity-50">
+                                <svg class="w-4 h-4 text-gray-700 dark:text-gray-200" fill="currentColor"
+                                    viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd"
+                                        d="M9 2a1 1 0 0 0-.894.553L7.382 4H4a1 1 0 0 0 0 2v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V6a1 1 0 1 0 0-2h-3.382l-.724-1.447A1 1 0 0 0 11 2zM7 8a1 1 0 0 1 2 0v6a1 1 0 1 1-2 0zm5-1a1 1 0 0 0-1 1v6a1 1 0 1 0 2 0V8a1 1 0 0 0-1-1"
+                                        clip-rule="evenodd" />
+                                </svg>
+                                {{-- Loading spinner for delete --}}
+                                <div wire:loading.flex wire:target="deleteCartItems('{{ $key }}')"
+                                    class="absolute inset-0 items-center justify-center">
+                                    <svg class="animate-spin h-4 w-4 text-skin-base"
+                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10"
+                                            stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor"
+                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                        </path>
+                                    </svg>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
 
                 </div>
-
-                <div class="flex items-center gap-2 justify-between">
-              
-
-                    <div class="relative inline-flex items-center max-w-[7rem]"
-                        wire:key='orderItemQty-{{ $key }}-counter'>
-                        <button type="button" wire:click="subQty('{{ $key }}')"
-                            wire:loading.attr="disabled" wire:loading.class="opacity-50"
-                            class="bg-gray-50 dark:bg-gray-700 dark:hover:bg-gray-600 dark:border-gray-600 hover:bg-gray-200 border border-gray-300 rounded-s-md p-3 h-8 relative">
-                            <svg class="w-2 h-2 text-gray-900 dark:text-white" aria-hidden="true"
-                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 2">
-                                <path stroke="currentColor" stroke-linecap="round"
-                                    stroke-linejoin="round" stroke-width="2" d="M1 1h16" />
-                            </svg>
-                            {{-- Loading spinner for subQty --}}
-                            <div wire:loading.flex wire:target="subQty('{{ $key }}')"
-                                class="absolute inset-0 items-center justify-center">
-                                <svg class="animate-spin h-3 w-3 text-skin-base"
-                                    xmlns="http://www.w3.org/2000/svg" fill="none"
-                                    viewBox="0 0 24 24">
-                                    <circle class="opacity-25" cx="12" cy="12" r="10"
-                                        stroke="currentColor" stroke-width="4"></circle>
-                                    <path class="opacity-75" fill="currentColor"
-                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                                    </path>
-                                </svg>
-                            </div>
-                        </button>
-
-                        <input type="text" wire:model.lazy="orderItemQty.{{ $key }}" wire:change="updateQty('{{ $key }}')"
-                            class="min-w-10 bg-white border-x-0 border-gray-300 h-8 text-center text-gray-900 text-sm block w-full py-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                            min="1" oninput="this.value = this.value.replace(/[^0-9]/g, '')" />
-
-                        <button type="button" wire:click="addQty('{{ $key }}')"
-                            wire:loading.attr="disabled" wire:loading.class="opacity-50"
-                            class="bg-gray-50 dark:bg-gray-700 dark:hover:bg-gray-600 dark:border-gray-600 hover:bg-gray-200 border border-gray-300 rounded-e-md p-3 h-8 relative">
-                            <svg class="w-2 h-2 text-gray-900 dark:text-white" aria-hidden="true"
-                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
-                                <path stroke="currentColor" stroke-linecap="round"
-                                    stroke-linejoin="round" stroke-width="2" d="M9 1v16M1 9h16" />
-                            </svg>
-                            {{-- Loading spinner for addQty --}}
-                            <div wire:loading.flex wire:target="addQty('{{ $key }}')"
-                                class="absolute inset-0 items-center justify-center">
-                                <svg class="animate-spin h-3 w-3 text-skin-base"
-                                    xmlns="http://www.w3.org/2000/svg" fill="none"
-                                    viewBox="0 0 24 24">
-                                    <circle class="opacity-25" cx="12" cy="12" r="10"
-                                        stroke="currentColor" stroke-width="4"></circle>
-                                    <path class="opacity-75" fill="currentColor"
-                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                                    </path>
-                                </svg>
-                            </div>
-                        </button>
-                    </div>
-
-                    <div>
-                        <x-pos.item-note :id="$key" :note="$itemNotes[$key] ?? ''" />
-                    </div>
-
-                    <div>
-                        <button
-                            class="rounded text-gray-800 dark:text-gray-400 border dark:border-gray-500 hover:bg-gray-200 dark:hover:bg-gray-900/20 p-2 relative"
-                            wire:click="deleteCartItems('{{ $key }}')" wire:loading.attr="disabled"
-                            wire:loading.class="opacity-50">
-                            <svg class="w-4 h-4 text-gray-700 dark:text-gray-200" fill="currentColor" viewBox="0 0 20 20"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path fill-rule="evenodd"
-                                    d="M9 2a1 1 0 0 0-.894.553L7.382 4H4a1 1 0 0 0 0 2v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V6a1 1 0 1 0 0-2h-3.382l-.724-1.447A1 1 0 0 0 11 2zM7 8a1 1 0 0 1 2 0v6a1 1 0 1 1-2 0zm5-1a1 1 0 0 0-1 1v6a1 1 0 1 0 2 0V8a1 1 0 0 0-1-1"
-                                    clip-rule="evenodd" />
-                            </svg>
-                            {{-- Loading spinner for delete --}}
-                            <div wire:loading.flex wire:target="deleteCartItems('{{ $key }}')"
-                                class="absolute inset-0 items-center justify-center">
-                                <svg class="animate-spin h-4 w-4 text-skin-base"
-                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                    <circle class="opacity-25" cx="12" cy="12" r="10"
-                                        stroke="currentColor" stroke-width="4"></circle>
-                                    <path class="opacity-75" fill="currentColor"
-                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                                    </path>
-                                </svg>
-                            </div>
-                        </button>
-                    </div>
-                </div>
-
-            </div>
             @empty
-            <div class="text-center text-gray-500 dark:text-gray-400 mt-4">
-                <div class="flex flex-col items-center justify-center">
-                    <svg class="w-12 h-12 text-gray-500 dark:text-gray-300" fill="none"
-                        stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                    </svg>
-                    <div class="text-gray-500 dark:text-gray-400 text-base">
-                        @lang('messages.noItemAdded')
-                    </div>
+                <div class="text-center text-gray-500 dark:text-gray-400 mt-4">
+                    <div class="flex flex-col items-center justify-center">
+                        <svg class="w-12 h-12 text-gray-500 dark:text-gray-300" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                        <div class="text-gray-500 dark:text-gray-400 text-base">
+                            @lang('messages.noItemAdded')
+                        </div>
 
+                    </div>
                 </div>
-            </div>
             @endforelse
 
         </div>
@@ -429,7 +452,7 @@
                     <div>
                         @lang('modules.delivery.deliveryFee')
                         <span class="text-xs text-gray-400">
-                            @if($deliveryFee == 0)
+                            @if ($deliveryFee == 0)
                                 (@lang('modules.delivery.freeDelivery'))
                             @endif
                         </span>
@@ -437,7 +460,7 @@
                     <div class="flex items-center gap-2">
                         <div class="relative">
                             <x-input type="number" step='1' min='0' class="w-16 text-sm"
-                            wire:model.live='deliveryFee' />
+                                wire:model.live='deliveryFee' />
                         </div>
                     </div>
                 </div>
@@ -549,7 +572,7 @@
         <div class="h-auto pt-3 select-none text-center w-full">
             @if (!$orderID || ($orderID && $orderDetail && $orderDetail->status !== 'draft'))
                 <div class="flex gap-3 mb-3">
-                    <button class="rounded bg-yellow-600 hover:bg-yellow-700 text-white w-full p-2 relative" wire:click="saveOrder('draft')"
+                    {{-- <button class="rounded bg-yellow-600 hover:bg-yellow-700 text-white w-full p-2 relative" wire:click="saveOrder('draft')"
                         wire:loading.attr="disabled" wire:loading.class="opacity-50">
                         <span wire:loading.remove wire:target="saveOrder('draft')">
                             @lang('modules.order.saveAsDraft')
@@ -565,7 +588,26 @@
                             </svg>
                             @lang('modules.order.saving')
                         </span>
+                    </button> --}}
+                    <button class="rounded bg-yellow-600 hover:bg-yellow-700 text-white w-full p-2 relative"
+                        onclick="if(!navigator.onLine){ handleOfflineSaveOrder('draft'); } else { @this.saveOrder('draft') }"
+                        wire:loading.attr="disabled" wire:loading.class="opacity-50">
+                        <span wire:loading.remove wire:target="saveOrder('draft')">
+                            @lang('modules.order.saveAsDraft')
+                        </span>
+                        <span wire:loading wire:target="saveOrder('draft')" class="inline-flex items-center">
+                            <svg class="animate-spin inline -ml-1 mr-2 h-4 w-4 text-white"
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10"
+                                    stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                </path>
+                            </svg>
+                            @lang('modules.order.saving')
+                        </span>
                     </button>
+
                 </div>
             @endif
             @if (in_array('KOT', restaurant_modules()))
@@ -574,8 +616,8 @@
                         wire:loading.attr="disabled" wire:loading.class="opacity-50">
                         <span wire:loading.remove wire:target="saveOrder('kot')">@lang('modules.order.kot')</span>
                         <span wire:loading wire:target="saveOrder('kot')">
-                            <svg class="animate-spin -ml-1 mr-1 h-4 w-4 inline-flex text-white" xmlns="http://www.w3.org/2000/svg"
-                                fill="none" viewBox="0 0 24 24">
+                            <svg class="animate-spin -ml-1 mr-1 h-4 w-4 inline-flex text-white"
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10"
                                     stroke="currentColor" stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor"
@@ -606,9 +648,9 @@
                         wire:loading.class="opacity-50">
                         <span wire:loading.remove
                             wire:target="saveOrder('kot','bill','payment', 'print')">@lang('modules.order.kotBillAndPayment')</span>
-                        <span wire:loading wire:target="saveOrder('kot','bill','payment', 'print')" >
-                            <svg class="animate-spin inline-flex -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg"
-                                fill="none" viewBox="0 0 24 24">
+                        <span wire:loading wire:target="saveOrder('kot','bill','payment', 'print')">
+                            <svg class="animate-spin inline-flex -ml-1 mr-2 h-4 w-4 text-white"
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10"
                                     stroke="currentColor" stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor"
@@ -626,8 +668,8 @@
                         wire:loading.attr="disabled" wire:loading.class="opacity-50">
                         <span wire:loading.remove wire:target="saveOrder('bill')">@lang('modules.order.bill')</span>
                         <span wire:loading wire:target="saveOrder('bill')">
-                            <svg class="animate-spin inline-flex items-center -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg"
-                                fill="none" viewBox="0 0 24 24">
+                            <svg class="animate-spin inline-flex items-center -ml-1 mr-2 h-4 w-4 text-white"
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10"
                                     stroke="currentColor" stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor"
@@ -642,8 +684,8 @@
                         wire:loading.class="opacity-50">
                         <span wire:loading.remove wire:target="saveOrder('bill', 'payment')">@lang('modules.order.billAndPayment')</span>
                         <span wire:loading wire:target="saveOrder('bill', 'payment')">
-                            <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline-flex items-center" xmlns="http://www.w3.org/2000/svg"
-                                fill="none" viewBox="0 0 24 24">
+                            <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline-flex items-center"
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10"
                                     stroke="currentColor" stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor"
@@ -679,7 +721,8 @@
         <x-slot name="title">
             <div class="flex items-center gap-2">
                 <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
                 @lang('modules.order.reservationConfirmation')
             </div>
@@ -689,14 +732,18 @@
             <div class="space-y-4">
                 <div class="text-center">
                     <svg class="mx-auto h-12 w-12 text-blue-100" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                        <path fill-rule="evenodd"
+                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                            clip-rule="evenodd" />
                     </svg>
                     <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">
                         @lang('modules.order.tableHasReservation')
                     </h3>
                     <div class="mt-2 text-sm text-gray-500 dark:text-gray-400">
                         <p>@lang('modules.order.reservationFor'): <strong>{{ $this->reservationCustomer?->name ?? 'N/A' }}</strong></p>
-                        <p>@lang('modules.order.reservationTime'): <strong>{{ $this->reservation?->reservation_date_time?->format('M d, Y g:i A') ?? 'N/A' }}</strong></p>
+                        <p>@lang('modules.order.reservationTime'):
+                            <strong>{{ $this->reservation?->reservation_date_time?->format('M d, Y g:i A') ?? 'N/A' }}</strong>
+                        </p>
                     </div>
                 </div>
 
@@ -730,7 +777,8 @@
         <x-slot name="title">
             <div class="flex items-center gap-2">
                 <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
                 </svg>
                 @lang('modules.order.changeTable')
             </div>
@@ -740,21 +788,24 @@
             <div class="space-y-4">
                 <div class="text-center">
                     <svg class="mx-auto h-12 w-12 text-amber-100" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                        <path fill-rule="evenodd"
+                            d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                            clip-rule="evenodd" />
                     </svg>
                     <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">
                         @lang('modules.order.confirmTableChange')
                     </h3>
                     <div class="mt-2 text-sm text-gray-500 dark:text-gray-400">
                         <p>@lang('modules.order.currentTable'): <strong>{{ $tableNo }}</strong></p>
-                        @if($pendingTable)
+                        @if ($pendingTable)
                             <p>@lang('modules.order.changeTo'): <strong>{{ $pendingTable->table_code }}</strong></p>
                         @endif
                         <p class="mt-2">@lang('modules.order.tableChangeMessage')</p>
                     </div>
                 </div>
 
-                <div class="bg-amber-50 dark:bg-amber-900/20 p-4 rounded-lg border border-amber-200 dark:border-amber-800">
+                <div
+                    class="bg-amber-50 dark:bg-amber-900/20 p-4 rounded-lg border border-amber-200 dark:border-amber-800">
                     <p class="text-sm text-amber-700 dark:text-amber-300 text-center">
                         @lang('modules.order.tableChangeWarning')
                     </p>
@@ -767,7 +818,8 @@
                 <x-button-cancel wire:click="cancelTableChange" wire:loading.attr="disabled">
                     @lang('app.cancel')
                 </x-button-cancel>
-                <x-button wire:click="confirmTableChange" wire:loading.attr="disabled" class="bg-amber-600 hover:bg-amber-700">
+                <x-button wire:click="confirmTableChange" wire:loading.attr="disabled"
+                    class="bg-amber-600 hover:bg-amber-700">
                     @lang('modules.order.changeTable')
                 </x-button>
             </div>
@@ -779,7 +831,8 @@
         <x-slot name="title">
             <div class="flex items-center gap-2">
                 <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                 </svg>
                 @lang('modules.order.mergeTables')
             </div>
@@ -787,25 +840,29 @@
 
         <x-slot name="content">
             <div class="space-y-4">
-                @if(count($tablesWithUnpaidOrders) > 0)
+                @if (count($tablesWithUnpaidOrders) > 0)
                     <div class="text-sm text-gray-600 dark:text-gray-400 mb-4">
                         @lang('modules.order.mergeTableDescription')
                     </div>
                     <div class="max-h-96 overflow-y-auto">
                         <div class="grid grid-cols-1 gap-3">
-                            @foreach($tablesWithUnpaidOrders as $table)
-                                <label class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer {{ in_array($table->id, $selectedTablesForMerge) ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-300 dark:border-blue-700' : '' }}">
+                            @foreach ($tablesWithUnpaidOrders as $table)
+                                <label
+                                    class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer {{ in_array($table->id, $selectedTablesForMerge) ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-300 dark:border-blue-700' : '' }}">
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center gap-3 flex-1">
-                                            <input type="checkbox" 
-                                                wire:model.live="selectedTablesForMerge" 
+                                            <input type="checkbox" wire:model.live="selectedTablesForMerge"
                                                 value="{{ $table->id }}"
                                                 class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                                            <svg fill="currentColor" class="w-6 h-6 text-gray-700 dark:text-gray-200" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44.999 44.999" xml:space="preserve">
-                                                <g stroke-width="0"/>
-                                                <g stroke-linecap="round" stroke-linejoin="round"/>
-                                                <path d="m42.558 23.378 2.406-10.92a1.512 1.512 0 0 0-2.954-.652l-2.145 9.733h-9.647a1.512 1.512 0 0 0 0 3.026h.573l-3.258 7.713a1.51 1.51 0 0 0 1.393 2.102c.59 0 1.15-.348 1.394-.925l2.974-7.038 4.717.001 2.971 7.037a1.512 1.512 0 1 0 2.787-1.177l-3.257-7.713h.573a1.51 1.51 0 0 0 1.473-1.187m-28.35 1.186h.573a1.512 1.512 0 0 0 0-3.026H5.134L2.99 11.806a1.511 1.511 0 1 0-2.954.652l2.406 10.92a1.51 1.51 0 0 0 1.477 1.187h.573L1.234 32.28a1.51 1.51 0 0 0 .805 1.98 1.515 1.515 0 0 0 1.982-.805l2.971-7.037 4.717-.001 2.972 7.038a1.514 1.514 0 0 0 1.982.805 1.51 1.51 0 0 0 .805-1.98z"/>
-                                                <path d="M24.862 31.353h-.852V18.308h8.13a1.513 1.513 0 1 0 0-3.025H12.856a1.514 1.514 0 0 0 0 3.025h8.13v13.045h-.852a1.514 1.514 0 0 0 0 3.027h4.728a1.513 1.513 0 1 0 0-3.027"/>
+                                            <svg fill="currentColor" class="w-6 h-6 text-gray-700 dark:text-gray-200"
+                                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44.999 44.999"
+                                                xml:space="preserve">
+                                                <g stroke-width="0" />
+                                                <g stroke-linecap="round" stroke-linejoin="round" />
+                                                <path
+                                                    d="m42.558 23.378 2.406-10.92a1.512 1.512 0 0 0-2.954-.652l-2.145 9.733h-9.647a1.512 1.512 0 0 0 0 3.026h.573l-3.258 7.713a1.51 1.51 0 0 0 1.393 2.102c.59 0 1.15-.348 1.394-.925l2.974-7.038 4.717.001 2.971 7.037a1.512 1.512 0 1 0 2.787-1.177l-3.257-7.713h.573a1.51 1.51 0 0 0 1.473-1.187m-28.35 1.186h.573a1.512 1.512 0 0 0 0-3.026H5.134L2.99 11.806a1.511 1.511 0 1 0-2.954.652l2.406 10.92a1.51 1.51 0 0 0 1.477 1.187h.573L1.234 32.28a1.51 1.51 0 0 0 .805 1.98 1.515 1.515 0 0 0 1.982-.805l2.971-7.037 4.717-.001 2.972 7.038a1.514 1.514 0 0 0 1.982.805 1.51 1.51 0 0 0 .805-1.98z" />
+                                                <path
+                                                    d="M24.862 31.353h-.852V18.308h8.13a1.513 1.513 0 1 0 0-3.025H12.856a1.514 1.514 0 0 0 0 3.025h8.13v13.045h-.852a1.514 1.514 0 0 0 0 3.027h4.728a1.513 1.513 0 1 0 0-3.027" />
                                             </svg>
                                             <div class="flex-1">
                                                 <div class="font-semibold text-gray-900 dark:text-white">
@@ -814,7 +871,7 @@
                                             </div>
                                         </div>
                                         <div class="text-xs text-gray-500 dark:text-gray-400 ml-4">
-                                            @if($table->activeOrder)
+                                            @if ($table->activeOrder)
                                                 {{ ucfirst($table->activeOrder->status) }}
                                             @endif
                                         </div>
@@ -823,8 +880,9 @@
                             @endforeach
                         </div>
                     </div>
-                    @if(count($selectedTablesForMerge) > 0)
-                        <div class="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                    @if (count($selectedTablesForMerge) > 0)
+                        <div
+                            class="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
                             <p class="text-sm text-blue-700 dark:text-blue-300">
                                 <strong>{{ count($selectedTablesForMerge) }}</strong> @lang('modules.order.tablesSelectedForMerge')
                             </p>
@@ -832,8 +890,10 @@
                     @endif
                 @else
                     <div class="text-center py-8">
-                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                         </svg>
                         <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">
                             @lang('modules.order.noTablesWithUnpaidOrders')
@@ -851,19 +911,17 @@
                 <x-button-cancel wire:click="closeMergeTableModal" wire:loading.attr="disabled">
                     @lang('app.close')
                 </x-button-cancel>
-                @if(count($tablesWithUnpaidOrders) > 0)
-                    @if(count($selectedTablesForMerge) > 0)
-                        <button type="button" 
-                            wire:click="mergeSelectedTables" 
-                            wire:loading.attr="disabled" 
+                @if (count($tablesWithUnpaidOrders) > 0)
+                    @if (count($selectedTablesForMerge) > 0)
+                        <button type="button" wire:click="mergeSelectedTables" wire:loading.attr="disabled"
                             wire:key="merge-button-enabled"
                             class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 active:bg-blue-900 focus:outline-none focus:border-blue-900 focus:ring focus:ring-blue-300 disabled:opacity-25 transition ease-in-out duration-150">
                             <span wire:loading.remove wire:target="mergeSelectedTables">
                                 @lang('modules.order.mergeTables')
                             </span>
                             <span wire:loading wire:target="mergeSelectedTables" class="inline-flex items-center">
-                                <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg"
-                                    fill="none" viewBox="0 0 24 24">
+                                <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                     <circle class="opacity-25" cx="12" cy="12" r="10"
                                         stroke="currentColor" stroke-width="4"></circle>
                                     <path class="opacity-75" fill="currentColor"
@@ -874,8 +932,8 @@
                             </span>
                         </button>
                     @else
-                        <button type="button" 
-                            class="inline-flex items-center px-4 py-2 bg-gray-400 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest cursor-not-allowed opacity-50" 
+                        <button type="button"
+                            class="inline-flex items-center px-4 py-2 bg-gray-400 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest cursor-not-allowed opacity-50"
                             disabled>
                             @lang('modules.order.mergeTables')
                         </button>
