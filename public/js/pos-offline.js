@@ -55,7 +55,7 @@ document.addEventListener('livewire:load', function () {
     });
 });
 
-wind// pos-offline.js
+// pos-offline.js
 
 // Existing online/offline detection code...
 // (your code already here)
