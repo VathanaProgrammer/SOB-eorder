@@ -202,6 +202,7 @@ window.handleOfflineSaveOrder = function (orderType) {
         };
         
 
+        
         const orderData = {
             restaurantName: restaurantInfo.name || 'Restaurant',
             kotNumber: null, // optional, can generate dynamic
