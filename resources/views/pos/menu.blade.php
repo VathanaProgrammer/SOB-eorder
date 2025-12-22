@@ -188,7 +188,7 @@
                     @scroll.throttle.100ms="scrollHandler($event.target)">
                     @forelse ($this->menuItems as $item)
                         <li class="group relative flex items-center justify-center">
-                            <input type="checkbox" id="item-{{ $item->id }}" value="{{ $item->id }}"
+                            {{-- <input type="checkbox" id="item-{{ $item->id }}" value="{{ $item->id }}"
                                 @click="addToCart({
                                     id: {{ $item->id }},
                                     name: '{{ $item->item_name }}',
@@ -198,7 +198,31 @@
                                 })"
                                 wire:click='addCartItems({{ $item->id }}, {{ $item->variations_count }}, {{ $item->modifier_groups_count }})'
                                 wire:key='item-input-{{ $item->id . microtime() }}' wire:loading.attr="disabled"
-                                {{ $orderLimitReached ? 'disabled' : '' }} class="hidden peer">
+                                {{ $orderLimitReached ? 'disabled' : '' }} class="hidden peer"> --}}
+
+                            <input type="checkbox"
+                                id="item-{{ $item->id }}"
+                                class="hidden peer"
+                                @click="
+                                    if (!online) {
+                                        addToCart({
+                                            id: {{ $item->id }},
+                                            name: '{{ $item->item_name }}',
+                                            price: {{ $item->price }},
+                                            qty: 1,
+                                            note: ''
+                                        });
+                                    } else {
+                                        $wire.addCartItems(
+                                            {{ $item->id }},
+                                            {{ $item->variations_count }},
+                                            {{ $item->modifier_groups_count }}
+                                        );
+                                    }
+                                "
+                                {{ $orderLimitReached ? 'disabled' : '' }}
+                            >
+
                             <label for="item-{{ $item->id }}" @class([
                                 'block lg:w-32 w-full rounded-lg shadow-sm transition-all duration-100 dark:shadow-gray-700 relative outline-none',
                                 'cursor-pointer hover:shadow-md dark:hover:bg-gray-700/30 peer-checked:ring-2 peer-checked:ring-skin-base active:scale-95 focus-visible:scale-95 focus-visible:ring-2 focus-visible:ring-skin-base' =>
