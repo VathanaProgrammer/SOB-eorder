@@ -95,7 +95,7 @@
                 </button>
 
 
-                <!-- Online/offline indicator -->
+                <!-- /offline indicator -->
                 <span id="posOnlineState" class="ml-2 px-2 py-1 rounded text-white text-sm font-medium bg-green-500">
                     Online
                 </span>
@@ -282,3 +282,20 @@
     </div>
     </div>
 </nav>
+
+<script>
+    // Save restaurant info for offline use
+    window.savePOSRestaurantInfo = function() {
+        const restaurantData = {
+            name: "{{ restaurant()->name }}",
+            logoUrl: "{{ restaurant()->logoUrl }}",
+            table: window.POS_TABLE || '-', // current table
+        };
+        localStorage.setItem('pos_restaurant_info', JSON.stringify(restaurantData));
+    };
+
+    // Call this on page load
+    window.addEventListener('DOMContentLoaded', () => {
+        window.savePOSRestaurantInfo();
+    });
+</script>
