@@ -190,18 +190,22 @@ window.onload = function(){ window.print(); window.onafterprint=()=>window.close
 // ------------------------------
 window.handleOfflineSaveOrder = function (orderType) {
     try {
+        // Load items from your Alpine offline cart
+        const offlineCart = JSON.parse(localStorage.getItem('offlineCart') || '[]');
+
         const orderData = {
             restaurantName: "Demo Restaurant",
             kotNumber: null, // optional, can generate dynamic
             order_number: `OFF-${Date.now()}`,
             table: window.POS_TABLE || '-',
-            items: window.POS_ITEMS || [],
+            items: offlineCart, // <-- THIS IS NOW YOUR REAL CART
             orderType,
             note: window.POS_NOTE || '',
             timestamp: new Date().toISOString(),
             waiter: window.POS_WAITER || null
         };
 
+        // Save to localStorage
         let offlineOrders = JSON.parse(localStorage.getItem('pos_offline_orders') || '[]');
         offlineOrders.push(orderData);
         localStorage.setItem('pos_offline_orders', JSON.stringify(offlineOrders));
@@ -214,3 +218,4 @@ window.handleOfflineSaveOrder = function (orderType) {
         console.error('Failed to save offline order:', err);
     }
 };
+
