@@ -214,8 +214,6 @@ window.handleOfflineSaveOrder = function (orderType) {
 
         // Print KOT immediately
         window.printOfflineKOT(orderData);
-
-        alert('Offline order saved and KOT printed!');
     } catch (err) {
         console.error('Failed to save offline order:', err);
     }
