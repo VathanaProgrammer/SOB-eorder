@@ -83,29 +83,32 @@ window.printOfflineKOT = function (orderData) {
             pickupTime: orderData.pickupTime || null
         },
         items: orderData.items.map(i => ({
-            name: i.name || i.item_name || 'Item',
-            variation: i.variation || null,
-            quantity: i.qty || i.quantity || 1,
-            modifiers: i.modifiers || [],
+            name: i.name,
+            variation: null,
+            quantity: i.qty,
+            modifiers: [],
             note: i.note || ''
         })),
         note: orderData.note || ''
     };
 
-    // Create new window for printing
-    const printWindow = window.open('', '_blank', 'width=400,height=600');
-    if (!printWindow) {
-        console.error('Popup blocked, cannot print KOT.');
-        return;
-    }
+    const itemsHTML = kot.items.map(item => `
+        <tr>
+            <td class="description">
+                ${item.name}${item.variation ? `<br><small>(${item.variation})</small>` : ''}
+                ${item.modifiers.length ? item.modifiers.map(m => `<div class="modifiers">• ${m}</div>`).join('') : ''}
+                ${item.note ? `<div class="modifiers"><strong>Note:</strong> ${item.note}</div>` : ''}
+            </td>
+            <td class="qty">${item.quantity}</td>
+        </tr>
+    `).join('');
 
-    // KOT HTML (same as your template)
     const html = `
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
 <meta charset="UTF-8">
-<title>KOT Ticket</title>
+<title>${kot.restaurant.name} - KOT Ticket</title>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; font-family:'DejaVu Sans', Arial, sans-serif; }
 [dir="rtl"]{ text-align:right; } [dir="ltr"]{ text-align:left; }
@@ -128,50 +131,41 @@ window.printOfflineKOT = function (orderData) {
 </head>
 <body>
 <div class="receipt">
-<div class="header">
-<div class="restaurant-info">${kot.restaurant.name}</div>
-</div>
-<div class="kot-title">
-KOT <span class="bold">#${kot.kotNumber}</span>
-${kot.tokenNumber ? `<div style="font-size:14pt; margin-top:1mm;">Token #: <span class="bold">${kot.tokenNumber}</span></div>` : ''}
-</div>
-<div class="order-info">
-<div class="order-row">
-<table>
-<tr>
-<td class="order-left"><span class="bold">${kot.order.number}</span></td>
-<td class="order-right">Table: <span class="bold">${kot.order.table}</span></td>
-</tr>
-</table>
-</div>
-<div class="order-row">
-<table>
-<tr>
-<td class="order-left">Date: ${kot.order.date}</td>
-<td class="order-right">Time: ${kot.order.time}</td>
-</tr>
-</table>
-</div>
-${kot.order.waiter ? `<div class="order-row"><table><tr><td class="order-left">Waiter: <span class="bold">${kot.order.waiter}</span></td><td class="order-right"></td></tr></table></div>` : ''}
-</div>
-<table class="items-table">
-<thead>
-<tr><th class="description">Item</th><th class="qty">Qty</th></tr>
-</thead>
-<tbody>
-${kot.items.map(item => `
-<tr>
-<td class="description">
-${item.name}${item.variation ? `<br><small>(${item.variation})</small>` : ''}
-${item.modifiers.length ? item.modifiers.map(m => `<div class="modifiers">• ${m}</div>`).join('') : ''}
-${item.note ? `<div class="modifiers"><strong>Note:</strong> ${item.note}</div>` : ''}
-</td>
-<td class="qty">${item.quantity}</td>
-</tr>
-`).join('')}
-</tbody>
-</table>
-${kot.note ? `<div class="footer"><strong>Special Instructions:</strong><div class="italic">${kot.note}</div></div>` : ''}
+    <div class="header">
+        <div class="restaurant-info">${kot.restaurant.name}</div>
+    </div>
+    <div class="kot-title">
+        KOT <span class="bold">#${kot.kotNumber}</span>
+        ${kot.tokenNumber ? `<div style="font-size:14pt; margin-top:1mm;">Token #: <span class="bold">${kot.tokenNumber}</span></div>` : ''}
+    </div>
+    <div class="order-info">
+        <div class="order-row">
+            <table>
+                <tr>
+                    <td class="order-left"><span class="bold">${kot.order.number}</span></td>
+                    <td class="order-right">Table: <span class="bold">${kot.order.table}</span></td>
+                </tr>
+            </table>
+        </div>
+        <div class="order-row">
+            <table>
+                <tr>
+                    <td class="order-left">Date: ${kot.order.date}</td>
+                    <td class="order-right">Time: ${kot.order.time}</td>
+                </tr>
+            </table>
+        </div>
+        ${kot.order.waiter ? `<div class="order-row"><table><tr><td class="order-left">Waiter: <span class="bold">${kot.order.waiter}</span></td><td class="order-right"></td></tr></table></div>` : ''}
+    </div>
+    <table class="items-table">
+        <thead>
+            <tr><th class="description">Item</th><th class="qty">Qty</th></tr>
+        </thead>
+        <tbody>
+            ${itemsHTML}
+        </tbody>
+    </table>
+    ${kot.note ? `<div class="footer"><strong>Special Instructions:</strong><div class="italic">${kot.note}</div></div>` : ''}
 </div>
 <script>
 window.onload = function(){ window.print(); window.onafterprint=()=>window.close(); };
@@ -179,6 +173,12 @@ window.onload = function(){ window.print(); window.onafterprint=()=>window.close
 </body>
 </html>
 `;
+
+    const printWindow = window.open('', '_blank', 'width=400,height=600');
+    if (!printWindow) {
+        console.error('Popup blocked, cannot print KOT.');
+        return;
+    }
 
     printWindow.document.open();
     printWindow.document.write(html);
