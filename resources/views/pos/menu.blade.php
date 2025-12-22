@@ -204,7 +204,7 @@
                                 id="item-{{ $item->id }}"
                                 class="hidden peer"
                                 @click="
-                                    if (!online) {
+                                    if (!window.POS_STATE.online) {
                                         addToCart({
                                             id: {{ $item->id }},
                                             name: '{{ $item->item_name }}',
