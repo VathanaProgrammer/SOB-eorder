@@ -194,16 +194,9 @@ window.handleOfflineSaveOrder = function (orderType) {
     try {
         // Load items from your Alpine offline cart
         const offlineCart = JSON.parse(localStorage.getItem('offlineCart') || '[]');
-        // Get restaurant info from localStorage
-        const restaurantInfo = JSON.parse(localStorage.getItem('pos_restaurant_info')) || {
-            name: 'Restaurant',
-            logoUrl: '',
-            table: '-'
-        };
-        
 
         const orderData = {
-            restaurantName: restaurantInfo.name || 'Restaurant',
+            restaurantName: "Demo Restaurant",
             kotNumber: null, // optional, can generate dynamic
             order_number: `OFF-${Date.now()}`,
             table: window.POS_TABLE || '-',

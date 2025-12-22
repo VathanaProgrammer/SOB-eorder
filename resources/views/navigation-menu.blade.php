@@ -282,20 +282,3 @@
     </div>
     </div>
 </nav>
-
-<script>
-    // Save restaurant info for offline use
-    window.savePOSRestaurantInfo = function() {
-        const restaurantData = {
-            name: "{{ restaurant()->name }}",
-            logoUrl: "{{ restaurant()->logoUrl }}",
-            table: window.POS_TABLE || '-', // current table
-        };
-        localStorage.setItem('pos_restaurant_info', JSON.stringify(restaurantData));
-    };
-
-    // Call this on page load
-    window.addEventListener('DOMContentLoaded', () => {
-        window.savePOSRestaurantInfo();
-    });
-</script>
