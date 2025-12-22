@@ -176,7 +176,7 @@ window.onload = function(){ window.print(); window.onafterprint=()=>window.close
 </html>
 `;
 
-    const printWindow = window.open('', '_blank', 'width=400,height=600');
+    const printWindow = window.open('', '_blank');
     if (!printWindow) {
         console.error('Popup blocked, cannot print KOT.');
         return;
