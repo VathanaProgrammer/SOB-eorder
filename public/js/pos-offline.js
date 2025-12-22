@@ -64,6 +64,8 @@ document.addEventListener('livewire:load', function () {
 // 5. Render KOT HTML offline
 // ------------------------------
 window.printOfflineKOT = function (orderData) {
+    console.log('items from localStorage: ', orderData);
+
     if (!orderData || !orderData.items || orderData.items.length === 0) {
         console.warn('No items to print KOT.');
         return;
