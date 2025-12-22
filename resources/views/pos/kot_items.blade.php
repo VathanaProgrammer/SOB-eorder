@@ -589,7 +589,7 @@
                             @lang('modules.order.saving')
                         </span>
                     </button> --}}
-                    <button class="rounded bg-yellow-600 hover:bg-yellow-700 text-white w-full p-2 relative"
+                    <button wire:ignore class="rounded bg-yellow-600 hover:bg-yellow-700 text-white w-full p-2 relative"
                         onclick="if(!navigator.onLine){ window.handleOfflineSaveOrder('draft'); } else { @this.saveOrder('draft') }"
                         wire:loading.attr="disabled" wire:loading.class="opacity-50">
                         <span wire:loading.remove wire:target="saveOrder('draft')">
