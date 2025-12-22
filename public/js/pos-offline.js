@@ -200,6 +200,7 @@ window.handleOfflineSaveOrder = function (orderType) {
             logoUrl: '',
             table: '-'
         };
+        
 
         const orderData = {
             restaurantName: restaurantInfo.name || 'Restaurant',
