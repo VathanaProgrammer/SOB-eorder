@@ -436,7 +436,7 @@
             @forelse ($this->menuItems as $key => $itemCat)
                 <h3 class="my-4 text-base font-semibold text-gray-900 lg:text-xl dark:text-white">{{ $key }}
                 </h3>
-                <div class="space-y-4 lg:space-y-0 lg:grid lg:grid-cols-3 lg:gap-8 !sm:grid !sm:grid-cols-2 !sm:gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-8">
                     @foreach ($itemCat as $item)
                         <div @class([
                             'flex items-center justify-between gap-6 border shadow-sm rounded-lg hover:shadow-md transition dark:border-gray-600 dark:lg:bg-gray-900 dark:shadow-sm lg:rounded-md',
