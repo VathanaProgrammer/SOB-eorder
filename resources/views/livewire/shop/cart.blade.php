@@ -526,10 +526,11 @@
                                                         $orderStats = getRestaurantOrderStats($shopBranch->id);
                                                     @endphp
                                                     @if(($orderStats['unlimited'] || $orderStats['current_count'] < $orderStats['order_limit']))
+                                                    <div class="pr-4 sm:pr-0">
                                                         <x-cart-button
-                                                        class="!pr-4 sm:!pr-0"
                                                                 wire:click='addCartItems({{ $item->id }}, {{ $item->variations_count }} , {{ $item->modifier_groups_count }})'
                                                                 wire:key='item-input-{{ $item->id . microtime() }}'>@lang('app.add')</x-cart-button>
+                                                    </div>
                                                     @endif
                                                 @endif
                                             @elseif ($item->variations_count > 0 && $restaurant->allow_customer_orders)
