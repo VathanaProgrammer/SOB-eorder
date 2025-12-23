@@ -13,6 +13,8 @@ window.addEventListener('online', () => {
 });
 
 window.addEventListener('offline', () => {
+    alert('offline active reload the page!');
+    window.location.reload();
     window.POS_STATE.online = false;
     console.log('Offline mode active');
     updateOfflineBanner();
