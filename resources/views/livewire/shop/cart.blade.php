@@ -450,9 +450,9 @@
                                         src="{{ $item->item_photo_url }}" alt="{{ $item->item_name }}">
                                 @endif
                                 <div
-                                    class="flex justify-center flex-col w-full gap-1 text-sm font-normal text-gray-500 lg:text-base dark:text-gray-400">
+                                    class="flex justify-center items-center flex-col w-full gap-1 text-sm font-normal text-gray-500 lg:text-base dark:text-gray-400">
                                     <div
-                                        class="inline-flex items-center text-sm font-semibold text-gray-900 lg:text-base dark:text-white">
+                                        class="inline-flex items-center md:justify-start justify-center text-sm font-semibold text-gray-900 lg:text-base dark:text-white">
                                         <img src="{{ asset('img/' . $item->type . '.svg') }}" class="h-4 mr-1"
                                             title="@lang('modules.menu.' . $item->type)" alt="" />
                                         {{ $item->getTranslatedValue('item_name', session('locale')) }}
@@ -526,9 +526,11 @@
                                                         $orderStats = getRestaurantOrderStats($shopBranch->id);
                                                     @endphp
                                                     @if(($orderStats['unlimited'] || $orderStats['current_count'] < $orderStats['order_limit']))
-                                                        <x-cart-button
+                                                    <div class="pr-0 sm:pr-4">
+                                                    <x-cart-button
                                                                 wire:click='addCartItems({{ $item->id }}, {{ $item->variations_count }} , {{ $item->modifier_groups_count }})'
                                                                 wire:key='item-input-{{ $item->id . microtime() }}'>@lang('app.add')</x-cart-button>
+                                                    </div>
                                                     @endif
                                                 @endif
                                             @elseif ($item->variations_count > 0 && $restaurant->allow_customer_orders)
