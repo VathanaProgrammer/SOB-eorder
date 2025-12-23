@@ -446,7 +446,7 @@
                         ]) wire:key='menu-item-{{ $item->id . microtime() }}'>
                             <div class="md:flex w-full p-3 space-x-4 flex flex-col justify-center items-center">
                                 @if ($restaurant && !$restaurant->hide_menu_item_image_on_customer_site)
-                                    <img class="object-cover w-16 h-16 rounded-md cursor-pointer lg:w-24 lg:h-24 pb-1"
+                                    <img class="object-cover w-16 h-16 rounded-md cursor-pointer lg:w-24 lg:h-24 mb-2"
                                         wire:click="showItemDetail({{ $item->id }})"
                                         src="{{ $item->item_photo_url }}" alt="{{ $item->item_name }}">
                                 @endif
