@@ -483,7 +483,7 @@
                                                 <div class="text-red-500">Out of stock</div>
                                             @elseif ($restaurant->allow_customer_orders)
                                                 @if (isset($cartItemQty[$item->id]) && $cartItemQty[$item->id] > 0)
-                                                    <div class="relative flex items-center justify-start max-w-24 me-2 mt-2"
+                                                    <div class="relative flex items-center justify-start max-w-24 me-2 mt-1"
                                                         wire:key='orderItemQty-{{ $item->id }}-counter'>
                                                         <button type="button"
                                                             @if ($item->variations_count > 0) wire:click="subCartItems({{ $item->id }})"
@@ -526,7 +526,7 @@
                                                         $orderStats = getRestaurantOrderStats($shopBranch->id);
                                                     @endphp
                                                     @if(($orderStats['unlimited'] || $orderStats['current_count'] < $orderStats['order_limit']))
-                                                    <div class="md:mr-4 mr-0 mt-2">
+                                                    <div class="md:me-4 me-0 mt-1">
                                                     <x-cart-button
                                                                 wire:click='addCartItems({{ $item->id }}, {{ $item->variations_count }} , {{ $item->modifier_groups_count }})'
                                                                 wire:key='item-input-{{ $item->id . microtime() }}'>@lang('app.add')</x-cart-button>
