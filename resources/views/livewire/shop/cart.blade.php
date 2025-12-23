@@ -483,7 +483,7 @@
                                                 <div class="text-red-500">Out of stock</div>
                                             @elseif ($restaurant->allow_customer_orders)
                                                 @if (isset($cartItemQty[$item->id]) && $cartItemQty[$item->id] > 0)
-                                                    <div class="relative flex items-center justify-start max-w-24 me-2 mt-1"
+                                                    <div class="relative flex items-center justify-start max-w-24 md:me-4 mt-1"
                                                         wire:key='orderItemQty-{{ $item->id }}-counter'>
                                                         <button type="button"
                                                             @if ($item->variations_count > 0) wire:click="subCartItems({{ $item->id }})"
