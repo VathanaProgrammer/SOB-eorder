@@ -504,7 +504,7 @@
 
                                                         <input type="text"
                                                             wire:model='cartItemQty.{{ $item->id }}'
-                                                            class="min-w-10 bg-white border-x-0 border-gray-300 h-8 text-center text-gray-900 text-sm  block w-full md:w-20 py-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white "
+                                                            class="min-w-10 bg-white border-x-0 border-gray-300 h-8 text-center text-gray-900 text-sm  block w-full md:w-10 py-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white "
                                                             value="1" readonly />
                                                         <button type="button"
                                                             wire:click="
