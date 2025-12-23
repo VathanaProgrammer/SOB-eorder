@@ -439,11 +439,11 @@
                 <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-8">
                     @foreach ($itemCat as $item)
                         <div @class([
-                            'md:flex items-center justify-between gap-6 border shadow-sm rounded-lg hover:shadow-md transition dark:border-gray-600 dark:lg:bg-gray-900 dark:shadow-sm lg:rounded-md',
+                            'flex items-center justify-between gap-6 border shadow-sm rounded-lg hover:shadow-md transition dark:border-gray-600 dark:lg:bg-gray-900 dark:shadow-sm lg:rounded-md',
                             'bg-gray-100 dark:bg-gray-800' => !$item->in_stock,
                             'bg-white dark:bg-gray-900' => $item->in_stock,
                         ]) wire:key='menu-item-{{ $item->id . microtime() }}'>
-                            <div class="flex w-full p-3 space-x-4">
+                            <div class="md:flex w-full p-3 space-x-4">
                                 @if ($restaurant && !$restaurant->hide_menu_item_image_on_customer_site)
                                     <img class="object-cover w-16 h-16 rounded-md cursor-pointer lg:w-24 lg:h-24"
                                         wire:click="showItemDetail({{ $item->id }})"
