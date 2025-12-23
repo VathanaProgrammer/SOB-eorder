@@ -484,7 +484,7 @@
                                                 <div class="text-red-500">Out of stock</div>
                                             @elseif ($restaurant->allow_customer_orders)
                                                 @if (isset($cartItemQty[$item->id]) && $cartItemQty[$item->id] > 0)
-                                                    <div class="relative flex items-center justify-start max-w-20 me-2 mt-1"
+                                                    <div class="relative flex items-center justify-start max-w-20 md:max-w-16 me-2 mt-1"
                                                         wire:key='orderItemQty-{{ $item->id }}-counter'>
                                                         <button type="button"
                                                             @if ($item->variations_count > 0) wire:click="subCartItems({{ $item->id }})"
@@ -503,9 +503,9 @@
                                                         </button>
 
                                                         <input type="text"
-                                                            wire:model='cartItemQty.{{ $item->id }}'
-                                                            class="min-w-10 bg-white border-x-0 border-gray-300 h-8 text-center text-gray-900 text-sm  block w-full md:w-10 py-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white "
-                                                            value="1" readonly />
+        wire:model='cartItemQty.{{ $item->id }}'
+        class="w-10 md:w-8 bg-white border-x-0 border-gray-300 h-8 text-center text-gray-900 text-sm block py-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+        value="1" readonly />
                                                         <button type="button"
                                                             wire:click="
                                                         @if ($item->variations_count > 0 || $item->modifier_groups_count > 0) addCartItems({{ $item->id }}, {{ $item->variations_count }}, {{ $item->modifier_groups_count }})
