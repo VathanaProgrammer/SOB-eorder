@@ -442,6 +442,7 @@
                             'flex items-center justify-between gap-6 border shadow-sm rounded-lg hover:shadow-md transition dark:border-gray-600 dark:lg:bg-gray-900 dark:shadow-sm lg:rounded-md',
                             'bg-gray-100 dark:bg-gray-800' => !$item->in_stock,
                             'bg-white dark:bg-gray-900' => $item->in_stock,
+                            'pr-4 sm:pr-6'
                         ]) wire:key='menu-item-{{ $item->id . microtime() }}'>
                             <div class="md:flex w-full p-3 space-x-4 flex flex-col justify-center items-center">
                                 @if ($restaurant && !$restaurant->hide_menu_item_image_on_customer_site)
@@ -483,7 +484,7 @@
                                                 <div class="text-red-500">Out of stock</div>
                                             @elseif ($restaurant->allow_customer_orders)
                                                 @if (isset($cartItemQty[$item->id]) && $cartItemQty[$item->id] > 0)
-                                                    <div class="relative flex items-center justify-start max-w-24 me-2 mt-1"
+                                                    <div class="relative flex items-center justify-start max-w-20 me-2 mt-1"
                                                         wire:key='orderItemQty-{{ $item->id }}-counter'>
                                                         <button type="button"
                                                             @if ($item->variations_count > 0) wire:click="subCartItems({{ $item->id }})"
