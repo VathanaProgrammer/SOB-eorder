@@ -470,7 +470,7 @@
                                             @lang('modules.menu.preparationTime') :
                                             {{ $item->preparation_time }} @lang('modules.menu.minutes')</div>
                                     @endif
-                                    <div class="flex md:flex-row flex-col items-center justify-between w-full gap-2 lg:gap-0">
+                                    <div class="flex md:flex-row flex-col items-center justify-between w-full gap-2 lg:gap-0 md:pe-2">
                                         <div>
                                             @if ($item->variations_count == 0)
                                                 <span
@@ -483,7 +483,7 @@
                                                 <div class="text-red-500">Out of stock</div>
                                             @elseif ($restaurant->allow_customer_orders)
                                                 @if (isset($cartItemQty[$item->id]) && $cartItemQty[$item->id] > 0)
-                                                    <div class="relative flex items-center justify-start max-w-24 pe-2 mt-1"
+                                                    <div class="relative flex items-center justify-start max-w-24 me-2 mt-1"
                                                         wire:key='orderItemQty-{{ $item->id }}-counter'>
                                                         <button type="button"
                                                             @if ($item->variations_count > 0) wire:click="subCartItems({{ $item->id }})"
