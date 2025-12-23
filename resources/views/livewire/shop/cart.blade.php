@@ -450,7 +450,7 @@
                                         src="{{ $item->item_photo_url }}" alt="{{ $item->item_name }}">
                                 @endif
                                 <div
-                                    class="flex flex-col w-full gap-1 text-sm font-normal text-gray-500 lg:text-base dark:text-gray-400">
+                                    class="flex justify-center flex-col w-full gap-1 text-sm font-normal text-gray-500 lg:text-base dark:text-gray-400">
                                     <div
                                         class="inline-flex items-center text-sm font-semibold text-gray-900 lg:text-base dark:text-white">
                                         <img src="{{ asset('img/' . $item->type . '.svg') }}" class="h-4 mr-1"
@@ -526,11 +526,9 @@
                                                         $orderStats = getRestaurantOrderStats($shopBranch->id);
                                                     @endphp
                                                     @if(($orderStats['unlimited'] || $orderStats['current_count'] < $orderStats['order_limit']))
-                                                    <div class="pr-4 sm:pr-0">
                                                         <x-cart-button
                                                                 wire:click='addCartItems({{ $item->id }}, {{ $item->variations_count }} , {{ $item->modifier_groups_count }})'
                                                                 wire:key='item-input-{{ $item->id . microtime() }}'>@lang('app.add')</x-cart-button>
-                                                    </div>
                                                     @endif
                                                 @endif
                                             @elseif ($item->variations_count > 0 && $restaurant->allow_customer_orders)
