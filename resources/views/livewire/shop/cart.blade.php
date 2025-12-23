@@ -470,7 +470,7 @@
                                             @lang('modules.menu.preparationTime') :
                                             {{ $item->preparation_time }} @lang('modules.menu.minutes')</div>
                                     @endif
-                                    <div class="flex items-center justify-between w-full">
+                                    <div class="flex flex-col md:flex-row items-center justify-between w-full">
                                         <div>
                                             @if ($item->variations_count == 0)
                                                 <span
