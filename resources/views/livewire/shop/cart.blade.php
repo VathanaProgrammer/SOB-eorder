@@ -443,7 +443,7 @@
                             'bg-gray-100 dark:bg-gray-800' => !$item->in_stock,
                             'bg-white dark:bg-gray-900' => $item->in_stock,
                         ]) wire:key='menu-item-{{ $item->id . microtime() }}'>
-                            <div class="md:flex w-full p-3 space-x-4">
+                            <div class="md:flex w-full p-3 space-x-4 flex flex-col justify-center items-center">
                                 @if ($restaurant && !$restaurant->hide_menu_item_image_on_customer_site)
                                     <img class="object-cover w-16 h-16 rounded-md cursor-pointer lg:w-24 lg:h-24"
                                         wire:click="showItemDetail({{ $item->id }})"
