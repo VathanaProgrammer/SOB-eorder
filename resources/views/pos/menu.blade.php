@@ -16,7 +16,7 @@
     
         init() {
             // Only load offline cart when offline
-            if (!navigator.onLine) {
+            if (!window.POS_STATE.online) {
                 this.cart = JSON.parse(localStorage.getItem('offlineCart') || '[]');
                 console.log('Offline mode: cart loaded', this.cart);
             }
@@ -26,6 +26,7 @@
                 console.log('Back online, disabling offline cart');
                 this.cart = [];
             });
+    
             window.addEventListener('offline', () => {
                 console.log('Offline mode activated');
                 this.cart = JSON.parse(localStorage.getItem('offlineCart') || '[]');
@@ -33,7 +34,7 @@
         },
     
         addToCart(item) {
-            if (!navigator.onLine) { // Only allow offline cart if offline
+            if (!window.POS_STATE.online) { // Only allow offline cart if offline
                 let existing = this.cart.find(i => i.id === item.id);
                 if (existing) {
                     existing.qty += item.qty || 1;
@@ -200,9 +201,7 @@
                                 wire:key='item-input-{{ $item->id . microtime() }}' wire:loading.attr="disabled"
                                 {{ $orderLimitReached ? 'disabled' : '' }} class="hidden peer"> --}}
 
-                            <input type="checkbox"
-                                id="item-{{ $item->id }}"
-                                class="hidden peer"
+                            <input type="checkbox" id="item-{{ $item->id }}" class="hidden peer"
                                 @click="
                                     if (!window.POS_STATE.online) {
                                         addToCart({
@@ -220,8 +219,7 @@
                                         );
                                     }
                                 "
-                                {{ $orderLimitReached ? 'disabled' : '' }}
-                            >
+                                {{ $orderLimitReached ? 'disabled' : '' }}>
 
                             <label for="item-{{ $item->id }}" @class([
                                 'block lg:w-32 w-full rounded-lg shadow-sm transition-all duration-100 dark:shadow-gray-700 relative outline-none',
