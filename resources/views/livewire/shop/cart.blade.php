@@ -471,7 +471,7 @@
                                             {{ $item->preparation_time }} @lang('modules.menu.minutes')</div>
                                     @endif
                                     <div class="flex md:flex-row flex-col items-center justify-between w-full gap-2 lg:gap-0 md:pe-2">
-                                        <div>
+                                        <div class="-ml-2 sm:-ml-4">
                                             @if ($item->variations_count == 0)
                                                 <span
                                                     class="font-semibold text-gray-900 dark:text-white">{{ currency_format($item->price, $restaurant->currency_id) }}</span>
@@ -526,11 +526,9 @@
                                                         $orderStats = getRestaurantOrderStats($shopBranch->id);
                                                     @endphp
                                                     @if(($orderStats['unlimited'] || $orderStats['current_count'] < $orderStats['order_limit']))
-                                                    <div class="sm:pr-4">
                                                     <x-cart-button
                                                                 wire:click='addCartItems({{ $item->id }}, {{ $item->variations_count }} , {{ $item->modifier_groups_count }})'
                                                                 wire:key='item-input-{{ $item->id . microtime() }}'>@lang('app.add')</x-cart-button>
-                                                    </div>
                                                     @endif
                                                 @endif
                                             @elseif ($item->variations_count > 0 && $restaurant->allow_customer_orders)
