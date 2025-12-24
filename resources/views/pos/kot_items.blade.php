@@ -237,98 +237,116 @@
 
         </div>
 
-<div class="flex flex-col rounded gap-1">
+        <div class="flex flex-col rounded gap-1">
 
-    @forelse ($orderItemList as $key => $item)
-        <div class="border border-gray-100 dark:border-gray-700 rounded-md p-2 flex flex-col gap-2">
-            <div class="flex flex-col gap-1">
-                <div class="flex items-center justify-between">
+            @forelse ($orderItemList as $key => $item)
+                <div class="border border-gray-100 dark:border-gray-700 rounded-md p-2 flex flex-col gap-2">
                     <div class="flex flex-col gap-1">
-                        <span class="text-gray-900 dark:text-white text-xs">{{ $item->item_name }}</span>
+                        <div class="flex items-center justify-between">
+                            <div class="flex flex-col gap-1">
+                                <span class="text-gray-900 dark:text-white text-xs">{{ $item->item_name }}</span>
 
-                        @if (isset($orderItemVariation[$key]))
-                            <span class="text-gray-500 dark:text-gray-400 text-xs">
-                                {!! '&bull; ' . $orderItemVariation[$key]->variation !!}
-                            </span>
-                        @endif
+                                @if (isset($orderItemVariation[$key]))
+                                    <span class="text-gray-500 dark:text-gray-400 text-xs">
+                                        {!! '&bull; ' . $orderItemVariation[$key]->variation !!}
+                                    </span>
+                                @endif
 
-                        @if (!empty($itemModifiersSelected[$key]))
-                            <div class="inline-flex flex-wrap gap-2 text-xs text-gray-600 dark:text-white">
-                                @foreach ($itemModifiersSelected[$key] as $modifierOptionId)
-                                    <div class="inline-flex items-center justify-between text-xs mb-1 py-0.5 px-1 border-l-2 border-blue-500 bg-gray-200 dark:bg-gray-900 rounded-md">
-                                        <span class="text-gray-900 dark:text-white">{{ $this->modifierOptions[$modifierOptionId]->name }}</span>
-                                        <span class="text-gray-600 dark:text-gray-300">{{ currency_format($this->modifierOptions[$modifierOptionId]->price, $restaurant->currency_id) }}</span>
+                                @if (!empty($itemModifiersSelected[$key]))
+                                    <div class="inline-flex flex-wrap gap-2 text-xs text-gray-600 dark:text-white">
+                                        @foreach ($itemModifiersSelected[$key] as $modifierOptionId)
+                                            <div
+                                                class="inline-flex items-center justify-between text-xs mb-1 py-0.5 px-1 border-l-2 border-blue-500 bg-gray-200 dark:bg-gray-900 rounded-md">
+                                                <span
+                                                    class="text-gray-900 dark:text-white">{{ $this->modifierOptions[$modifierOptionId]->name }}</span>
+                                                <span
+                                                    class="text-gray-600 dark:text-gray-300">{{ currency_format($this->modifierOptions[$modifierOptionId]->price, $restaurant->currency_id) }}</span>
+                                            </div>
+                                        @endforeach
                                     </div>
-                                @endforeach
+                                @endif
                             </div>
-                        @endif
+
+                            @php
+                                $displayPrice = $this->getItemDisplayPrice($key);
+                                $totalAmount = $orderItemAmount[$key];
+                            @endphp
+                            <div class="flex items-center gap-2">
+                                <div class="text-gray-500 dark:text-gray-400 text-xs">
+                                    {{ currency_format($displayPrice, restaurant()->currency_id) }}</div>
+                                <div class="text-gray-500 dark:text-gray-400 text-xs font-bold">
+                                    {{ currency_format($totalAmount, restaurant()->currency_id) }}</div>
+                            </div>
+                        </div>
                     </div>
 
-                    @php
-                        $displayPrice = $this->getItemDisplayPrice($key);
-                        $totalAmount = $orderItemAmount[$key];
-                    @endphp
-                    <div class="flex items-center gap-2">
-                        <div class="text-gray-500 dark:text-gray-400 text-xs">{{ currency_format($displayPrice, restaurant()->currency_id) }}</div>
-                        <div class="text-gray-500 dark:text-gray-400 text-xs font-bold">{{ currency_format($totalAmount, restaurant()->currency_id) }}</div>
+                    <div class="flex items-center gap-2 justify-between">
+                        <div class="relative inline-flex items-center max-w-[7rem]"
+                            wire:key='orderItemQty-{{ $key }}-counter'>
+                            <button type="button" wire:click="subQty('{{ $key }}')"
+                                wire:loading.attr="disabled" wire:loading.class="opacity-50"
+                                class="bg-gray-50 dark:bg-gray-700 dark:hover:bg-gray-600 dark:border-gray-600 hover:bg-gray-200 border border-gray-300 rounded-s-md p-3 h-8 relative">-</button>
+                            <input type="text" wire:model.lazy="orderItemQty.{{ $key }}"
+                                wire:change="updateQty('{{ $key }}')"
+                                class="min-w-10 bg-white border-x-0 border-gray-300 h-8 text-center text-gray-900 text-sm block w-full py-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                                min="1" oninput="this.value=this.value.replace(/[^0-9]/g,'')" />
+                            <button type="button" wire:click="addQty('{{ $key }}')"
+                                wire:loading.attr="disabled" wire:loading.class="opacity-50"
+                                class="bg-gray-50 dark:bg-gray-700 dark:hover:bg-gray-600 dark:border-gray-600 hover:bg-gray-200 border border-gray-300 rounded-e-md p-3 h-8 relative">+</button>
+                        </div>
+
+                        <div>
+                            <x-pos.item-note :id="$key" :note="$itemNotes[$key] ?? ''" />
+                        </div>
+
+                        <div>
+                            <button
+                                class="rounded text-gray-800 dark:text-gray-400 border dark:border-gray-500 hover:bg-gray-200 dark:hover:bg-gray-900/20 p-2 relative"
+                                wire:click="deleteCartItems('{{ $key }}')" wire:loading.attr="disabled"
+                                wire:loading.class="opacity-50">🗑</button>
+                        </div>
                     </div>
                 </div>
-            </div>
-
-            <div class="flex items-center gap-2 justify-between">
-                <div class="relative inline-flex items-center max-w-[7rem]" wire:key='orderItemQty-{{ $key }}-counter'>
-                    <button type="button" wire:click="subQty('{{ $key }}')" wire:loading.attr="disabled" wire:loading.class="opacity-50" class="bg-gray-50 dark:bg-gray-700 dark:hover:bg-gray-600 dark:border-gray-600 hover:bg-gray-200 border border-gray-300 rounded-s-md p-3 h-8 relative">-</button>
-                    <input type="text" wire:model.lazy="orderItemQty.{{ $key }}" wire:change="updateQty('{{ $key }}')" class="min-w-10 bg-white border-x-0 border-gray-300 h-8 text-center text-gray-900 text-sm block w-full py-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" min="1" oninput="this.value=this.value.replace(/[^0-9]/g,'')" />
-                    <button type="button" wire:click="addQty('{{ $key }}')" wire:loading.attr="disabled" wire:loading.class="opacity-50" class="bg-gray-50 dark:bg-gray-700 dark:hover:bg-gray-600 dark:border-gray-600 hover:bg-gray-200 border border-gray-300 rounded-e-md p-3 h-8 relative">+</button>
+            @empty
+                <div class="text-center text-gray-500 dark:text-gray-400 mt-4">
+                    <div class="flex flex-col items-center justify-center">
+                        <svg class="w-12 h-12 text-gray-500 dark:text-gray-300" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                        <div class="text-gray-500 dark:text-gray-400 text-base">@lang('messages.noItemAdded')</div>
+                    </div>
                 </div>
-
-                <div>
-                    <x-pos.item-note :id="$key" :note="$itemNotes[$key] ?? ''" />
-                </div>
-
-                <div>
-                    <button class="rounded text-gray-800 dark:text-gray-400 border dark:border-gray-500 hover:bg-gray-200 dark:hover:bg-gray-900/20 p-2 relative" wire:click="deleteCartItems('{{ $key }}')" wire:loading.attr="disabled" wire:loading.class="opacity-50">🗑</button>
-                </div>
-            </div>
+            @endforelse
         </div>
-    @empty
-        <div class="text-center text-gray-500 dark:text-gray-400 mt-4">
-            <div class="flex flex-col items-center justify-center">
-                <svg class="w-12 h-12 text-gray-500 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-                <div class="text-gray-500 dark:text-gray-400 text-base">@lang('messages.noItemAdded')</div>
-            </div>
-        </div>
-    @endforelse
-</div>
 
-<script>
-document.addEventListener('alpine:init', () => {
-    Alpine.data('cartOfflineListener', () => ({
-        initOfflineCart() {
-            // Only run when offline
-            if (!navigator.onLine) {
-                let offlineCart = JSON.parse(localStorage.getItem('offlineCart') || '[]');
-                offlineCart.forEach(item => {
-                    // Trigger Livewire to add offline items to the cart
-                    @this.call('addOfflineItem', item);
-                });
-            }
+        <script>
+            document.addEventListener('alpine:init', () => {
+            Alpine.data('cartOfflineListener', () => ({
+                initOfflineCart() {
+                    // Only run when offline
+                    if (!navigator.onLine) {
+                        let offlineCart = JSON.parse(localStorage.getItem('offlineCart') || '[]');
+                        offlineCart.forEach(item => {
+                            // Trigger Livewire to add offline items to the cart
+                            @this.call('addOfflineItem', item);
+                        });
+                    }
 
-            // Listen for new offline items added dynamically
-            window.addEventListener('cart-updated', e => {
-                if (!navigator.onLine) {
-                    const offlineItems = e.detail;
-                    offlineItems.forEach(item => {
-                        @this.call('addOfflineItem', item);
+                    // Listen for new offline items added dynamically
+                    window.addEventListener('cart-updated', e => {
+                        if (!navigator.onLine) {
+                            const offlineItems = e.detail;
+                            offlineItems.forEach(item => {
+                                @this.call('addOfflineItem', item);
+                            });
+                        }
                     });
                 }
+            }));
             });
-        }
-    }));
-}));
-</script>
+        </script>
 
     </div>
 
@@ -529,7 +547,8 @@ document.addEventListener('alpine:init', () => {
                             @lang('modules.order.saving')
                         </span>
                     </button> --}}
-                    <button wire:ignore class="rounded bg-yellow-600 hover:bg-yellow-700 text-white w-full p-2 relative"
+                    <button wire:ignore
+                        class="rounded bg-yellow-600 hover:bg-yellow-700 text-white w-full p-2 relative"
                         onclick="if(!navigator.onLine){ window.handleOfflineSaveOrder('draft'); } else { @this.saveOrder('draft') }"
                         wire:loading.attr="disabled" wire:loading.class="opacity-50">
                         <span wire:loading.remove wire:target="saveOrder('draft')">
