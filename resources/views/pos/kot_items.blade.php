@@ -1,4 +1,4 @@
-<div
+<div  x-data="offlineCartHandler()" x-init="init()"
     class="lg:w-6/12 flex flex-col bg-white border-l dark:border-gray-700 min-h-screen h-auto pr-4 px-2 py-4 dark:bg-gray-800 relative">
 
     {{-- Order Type Indicator --}}
