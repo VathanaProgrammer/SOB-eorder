@@ -7,29 +7,32 @@
         showMenu: false,
         cart: [],
         menuItems: [],
-        loadingMenu: true, // spinner flag
+        loadingMenu: false, // start as false
     
         init() {
             // Load offline cart
             if (!window.POS_STATE.online) {
                 this.cart = JSON.parse(localStorage.getItem('offlineCart') || '[]');
-                console.log('Offline cart loaded', this.cart);
-    
-                // simulate menu loading
-                this.loadingMenu = true;
-                setTimeout(() => {
-                    this.menuItems = JSON.parse(localStorage.getItem('offlineMenuItems') || '[]');
-                    this.loadingMenu = false;
-                }, 500);
             }
     
-            window.addEventListener('online', () => {
-                this.cart = [];
-            });
-    
+            window.addEventListener('online', () => { this.cart = []; });
             window.addEventListener('offline', () => {
                 this.cart = JSON.parse(localStorage.getItem('offlineCart') || '[]');
             });
+        },
+    
+        toggleMenu() {
+            this.showMenu = !this.showMenu;
+    
+            // Only load offline menu when opening menu offline
+            if (this.showMenu && !window.POS_STATE.online && this.menuItems.length === 0) {
+                this.loadingMenu = true;
+    
+                setTimeout(() => {
+                    this.menuItems = JSON.parse(localStorage.getItem('offlineMenuItems') || '[]');
+                    this.loadingMenu = false;
+                }, 500); // simulate delay
+            }
         },
     
         addToCart(item) {
@@ -37,13 +40,7 @@
             this.cart.push(item);
             localStorage.setItem('offlineCart', JSON.stringify(this.cart));
     
-            setTimeout(() => {
-                this.loadingMenu = false;
-            }, 300);
-        },
-    
-        toggleMenu() {
-            this.showMenu = !this.showMenu;
+            setTimeout(() => { this.loadingMenu = false; }, 300);
         }
     }">
 
