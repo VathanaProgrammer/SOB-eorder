@@ -237,159 +237,99 @@
 
         </div>
 
-        <div class="flex flex-col rounded gap-1">
-            @forelse ($orderItemList as $key => $item)
-                <div class="border border-gray-100 dark:border-gray-700 rounded-md p-2 flex flex-col gap-2">
+<div class="flex flex-col rounded gap-1">
+
+    @forelse ($orderItemList as $key => $item)
+        <div class="border border-gray-100 dark:border-gray-700 rounded-md p-2 flex flex-col gap-2">
+            <div class="flex flex-col gap-1">
+                <div class="flex items-center justify-between">
                     <div class="flex flex-col gap-1">
-                        <div class="flex items-center justify-between">
-                            <div class="flex flex-col gap-1">
-                                <span class="text-gray-900 dark:text-white text-xs">
-                                    {{ $item->item_name }}
-                                </span>
+                        <span class="text-gray-900 dark:text-white text-xs">{{ $item->item_name }}</span>
 
-                                @if (isset($orderItemVariation[$key]))
-                                    <span class="text-gray-500 dark:text-gray-400 text-xs">
-                                        {!! isset($orderItemVariation[$key]) ? '&bull; ' . $orderItemVariation[$key]->variation : '' !!}
-                                    </span>
-                                @endif
+                        @if (isset($orderItemVariation[$key]))
+                            <span class="text-gray-500 dark:text-gray-400 text-xs">
+                                {!! '&bull; ' . $orderItemVariation[$key]->variation !!}
+                            </span>
+                        @endif
 
-
-                                @if (!empty($itemModifiersSelected[$key]))
-                                    <div class="inline-flex flex-wrap gap-2 text-xs text-gray-600 dark:text-white">
-                                        @foreach ($itemModifiersSelected[$key] as $modifierOptionId)
-                                            <div
-                                                class="inline-flex items-center justify-between text-xs mb-1 py-0.5 px-1 border-l-2 border-blue-500 bg-gray-200 dark:bg-gray-900 rounded-md">
-                                                <span
-                                                    class="text-gray-900 dark:text-white">{{ $this->modifierOptions[$modifierOptionId]->name }}</span>
-                                                <span
-                                                    class="text-gray-600 dark:text-gray-300">{{ currency_format($this->modifierOptions[$modifierOptionId]->price, $restaurant->currency_id) }}</span>
-                                            </div>
-                                        @endforeach
+                        @if (!empty($itemModifiersSelected[$key]))
+                            <div class="inline-flex flex-wrap gap-2 text-xs text-gray-600 dark:text-white">
+                                @foreach ($itemModifiersSelected[$key] as $modifierOptionId)
+                                    <div class="inline-flex items-center justify-between text-xs mb-1 py-0.5 px-1 border-l-2 border-blue-500 bg-gray-200 dark:bg-gray-900 rounded-md">
+                                        <span class="text-gray-900 dark:text-white">{{ $this->modifierOptions[$modifierOptionId]->name }}</span>
+                                        <span class="text-gray-600 dark:text-gray-300">{{ currency_format($this->modifierOptions[$modifierOptionId]->price, $restaurant->currency_id) }}</span>
                                     </div>
-                                @endif
+                                @endforeach
                             </div>
-
-                            @php
-                                $displayPrice = $this->getItemDisplayPrice($key);
-                                $totalAmount = $orderItemAmount[$key];
-                            @endphp
-                            <div class="flex items-center gap-2">
-                                <div class="text-gray-500 dark:text-gray-400 text-xs">
-                                    {{ currency_format($displayPrice, restaurant()->currency_id) }}
-                                </div>
-                                <div class="text-gray-500 dark:text-gray-400 text-xs font-bold">
-                                    {{ currency_format($totalAmount, restaurant()->currency_id) }}
-                                </div>
-                            </div>
-                        </div>
-
-
+                        @endif
                     </div>
 
-                    <div class="flex items-center gap-2 justify-between">
-
-
-                        <div class="relative inline-flex items-center max-w-[7rem]"
-                            wire:key='orderItemQty-{{ $key }}-counter'>
-                            <button type="button" wire:click="subQty('{{ $key }}')"
-                                wire:loading.attr="disabled" wire:loading.class="opacity-50"
-                                class="bg-gray-50 dark:bg-gray-700 dark:hover:bg-gray-600 dark:border-gray-600 hover:bg-gray-200 border border-gray-300 rounded-s-md p-3 h-8 relative">
-                                <svg class="w-2 h-2 text-gray-900 dark:text-white" aria-hidden="true"
-                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 2">
-                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                        stroke-width="2" d="M1 1h16" />
-                                </svg>
-                                {{-- Loading spinner for subQty --}}
-                                <div wire:loading.flex wire:target="subQty('{{ $key }}')"
-                                    class="absolute inset-0 items-center justify-center">
-                                    <svg class="animate-spin h-3 w-3 text-skin-base"
-                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                        <circle class="opacity-25" cx="12" cy="12" r="10"
-                                            stroke="currentColor" stroke-width="4"></circle>
-                                        <path class="opacity-75" fill="currentColor"
-                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                                        </path>
-                                    </svg>
-                                </div>
-                            </button>
-
-                            <input type="text" wire:model.lazy="orderItemQty.{{ $key }}"
-                                wire:change="updateQty('{{ $key }}')"
-                                class="min-w-10 bg-white border-x-0 border-gray-300 h-8 text-center text-gray-900 text-sm block w-full py-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                                min="1" oninput="this.value = this.value.replace(/[^0-9]/g, '')" />
-
-                            <button type="button" wire:click="addQty('{{ $key }}')"
-                                wire:loading.attr="disabled" wire:loading.class="opacity-50"
-                                class="bg-gray-50 dark:bg-gray-700 dark:hover:bg-gray-600 dark:border-gray-600 hover:bg-gray-200 border border-gray-300 rounded-e-md p-3 h-8 relative">
-                                <svg class="w-2 h-2 text-gray-900 dark:text-white" aria-hidden="true"
-                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
-                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                        stroke-width="2" d="M9 1v16M1 9h16" />
-                                </svg>
-                                {{-- Loading spinner for addQty --}}
-                                <div wire:loading.flex wire:target="addQty('{{ $key }}')"
-                                    class="absolute inset-0 items-center justify-center">
-                                    <svg class="animate-spin h-3 w-3 text-skin-base"
-                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                        <circle class="opacity-25" cx="12" cy="12" r="10"
-                                            stroke="currentColor" stroke-width="4"></circle>
-                                        <path class="opacity-75" fill="currentColor"
-                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                                        </path>
-                                    </svg>
-                                </div>
-                            </button>
-                        </div>
-
-                        <div>
-                            <x-pos.item-note :id="$key" :note="$itemNotes[$key] ?? ''" />
-                        </div>
-
-                        <div>
-                            <button
-                                class="rounded text-gray-800 dark:text-gray-400 border dark:border-gray-500 hover:bg-gray-200 dark:hover:bg-gray-900/20 p-2 relative"
-                                wire:click="deleteCartItems('{{ $key }}')" wire:loading.attr="disabled"
-                                wire:loading.class="opacity-50">
-                                <svg class="w-4 h-4 text-gray-700 dark:text-gray-200" fill="currentColor"
-                                    viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                    <path fill-rule="evenodd"
-                                        d="M9 2a1 1 0 0 0-.894.553L7.382 4H4a1 1 0 0 0 0 2v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V6a1 1 0 1 0 0-2h-3.382l-.724-1.447A1 1 0 0 0 11 2zM7 8a1 1 0 0 1 2 0v6a1 1 0 1 1-2 0zm5-1a1 1 0 0 0-1 1v6a1 1 0 1 0 2 0V8a1 1 0 0 0-1-1"
-                                        clip-rule="evenodd" />
-                                </svg>
-                                {{-- Loading spinner for delete --}}
-                                <div wire:loading.flex wire:target="deleteCartItems('{{ $key }}')"
-                                    class="absolute inset-0 items-center justify-center">
-                                    <svg class="animate-spin h-4 w-4 text-skin-base"
-                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                        <circle class="opacity-25" cx="12" cy="12" r="10"
-                                            stroke="currentColor" stroke-width="4"></circle>
-                                        <path class="opacity-75" fill="currentColor"
-                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                                        </path>
-                                    </svg>
-                                </div>
-                            </button>
-                        </div>
-                    </div>
-
-                </div>
-            @empty
-                <div class="text-center text-gray-500 dark:text-gray-400 mt-4">
-                    <div class="flex flex-col items-center justify-center">
-                        <svg class="w-12 h-12 text-gray-500 dark:text-gray-300" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                        </svg>
-                        <div class="text-gray-500 dark:text-gray-400 text-base">
-                            @lang('messages.noItemAdded')
-                        </div>
-
+                    @php
+                        $displayPrice = $this->getItemDisplayPrice($key);
+                        $totalAmount = $orderItemAmount[$key];
+                    @endphp
+                    <div class="flex items-center gap-2">
+                        <div class="text-gray-500 dark:text-gray-400 text-xs">{{ currency_format($displayPrice, restaurant()->currency_id) }}</div>
+                        <div class="text-gray-500 dark:text-gray-400 text-xs font-bold">{{ currency_format($totalAmount, restaurant()->currency_id) }}</div>
                     </div>
                 </div>
-            @endforelse
+            </div>
 
+            <div class="flex items-center gap-2 justify-between">
+                <div class="relative inline-flex items-center max-w-[7rem]" wire:key='orderItemQty-{{ $key }}-counter'>
+                    <button type="button" wire:click="subQty('{{ $key }}')" wire:loading.attr="disabled" wire:loading.class="opacity-50" class="bg-gray-50 dark:bg-gray-700 dark:hover:bg-gray-600 dark:border-gray-600 hover:bg-gray-200 border border-gray-300 rounded-s-md p-3 h-8 relative">-</button>
+                    <input type="text" wire:model.lazy="orderItemQty.{{ $key }}" wire:change="updateQty('{{ $key }}')" class="min-w-10 bg-white border-x-0 border-gray-300 h-8 text-center text-gray-900 text-sm block w-full py-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" min="1" oninput="this.value=this.value.replace(/[^0-9]/g,'')" />
+                    <button type="button" wire:click="addQty('{{ $key }}')" wire:loading.attr="disabled" wire:loading.class="opacity-50" class="bg-gray-50 dark:bg-gray-700 dark:hover:bg-gray-600 dark:border-gray-600 hover:bg-gray-200 border border-gray-300 rounded-e-md p-3 h-8 relative">+</button>
+                </div>
+
+                <div>
+                    <x-pos.item-note :id="$key" :note="$itemNotes[$key] ?? ''" />
+                </div>
+
+                <div>
+                    <button class="rounded text-gray-800 dark:text-gray-400 border dark:border-gray-500 hover:bg-gray-200 dark:hover:bg-gray-900/20 p-2 relative" wire:click="deleteCartItems('{{ $key }}')" wire:loading.attr="disabled" wire:loading.class="opacity-50">🗑</button>
+                </div>
+            </div>
         </div>
+    @empty
+        <div class="text-center text-gray-500 dark:text-gray-400 mt-4">
+            <div class="flex flex-col items-center justify-center">
+                <svg class="w-12 h-12 text-gray-500 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                <div class="text-gray-500 dark:text-gray-400 text-base">@lang('messages.noItemAdded')</div>
+            </div>
+        </div>
+    @endforelse
+</div>
+
+<script>
+document.addEventListener('alpine:init', () => {
+    Alpine.data('cartOfflineListener', () => ({
+        initOfflineCart() {
+            // Only run when offline
+            if (!navigator.onLine) {
+                let offlineCart = JSON.parse(localStorage.getItem('offlineCart') || '[]');
+                offlineCart.forEach(item => {
+                    // Trigger Livewire to add offline items to the cart
+                    @this.call('addOfflineItem', item);
+                });
+            }
+
+            // Listen for new offline items added dynamically
+            window.addEventListener('cart-updated', e => {
+                if (!navigator.onLine) {
+                    const offlineItems = e.detail;
+                    offlineItems.forEach(item => {
+                        @this.call('addOfflineItem', item);
+                    });
+                }
+            });
+        }
+    }));
+}));
+</script>
+
     </div>
 
     <div class="lg:min-w-20 sticky bottom-0">

@@ -14,10 +14,10 @@
                 this.cart = JSON.parse(localStorage.getItem('offlineCart') || '[]');
             }
     
-            window.addEventListener('online', () => { this.cart = []; });
-            window.addEventListener('offline', () => {
+            if (window.POS_STATE.online) { this.cart = []; };
+            if (!window.POS_STATE.online) {
                 this.cart = JSON.parse(localStorage.getItem('offlineCart') || '[]');
-            });
+            };
         },
     
         toggleMenu() {
@@ -49,6 +49,9 @@
             }
     
             localStorage.setItem('offlineCart', JSON.stringify(this.cart));
+    
+            // Dispatch event to update panel immediately
+            window.dispatchEvent(new CustomEvent('cart-updated', { detail: this.cart }));
     
             setTimeout(() => {
                 this.loadingItems[item.id] = false;
