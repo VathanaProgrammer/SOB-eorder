@@ -227,72 +227,71 @@ window.handleOfflineSaveOrder = function (orderType) {
     }
 };
 
-document.addEventListener('DOMContentLoaded', function () {
-    const onlineCart = document.getElementById('online-cart');
-    const offlineCart = document.getElementById('offline-cart');
+const onlineCart = document.getElementById('online-cart');
+const offlineCart = document.getElementById('offline-cart');
 
-    function updateCartMode() {
-        if (!onlineCart || !offlineCart) return; // safety check
+function updateCartMode() {
+    if (!onlineCart || !offlineCart) return; // safety check
 
-        if (navigator.onLine) {
-            onlineCart.classList.remove('hidden');
-            offlineCart.classList.add('hidden');
-        } else {
-            onlineCart.classList.add('hidden');
-            offlineCart.classList.remove('hidden');
-            renderOfflineCart();
-        }
+    if (navigator.onLine) {
+        onlineCart.classList.remove('hidden');
+        offlineCart.classList.add('hidden');
+    } else {
+        onlineCart.classList.add('hidden');
+        offlineCart.classList.remove('hidden');
+        renderOfflineCart();
+    }
+}
+
+window.addEventListener('online', updateCartMode);
+window.addEventListener('offline', updateCartMode);
+
+updateCartMode(); // initial run
+
+// Other functions that need to access offlineCart
+window.addOfflineItem = function (item) {
+    const cart = getOfflineCart();
+    cart.push(item);
+    saveOfflineCart(cart);
+    renderOfflineCart();
+};
+
+function renderOfflineCart() {
+    const container = document.getElementById('offline-cart-items');
+    const empty = document.getElementById('offline-empty');
+    if (!empty) { console.log('empty does not exist.: ') };
+    if (!container) { console.log('container does not exist.: ') };
+    if (empty) { console.log('empty does exist.: ') };
+    if (container) { console.log('container does exist.: ') };
+    if (!container || !empty) return;
+
+    const cart = getOfflineCart();
+    container.innerHTML = '';
+
+    if (!cart.length) {
+        empty.classList.remove('hidden');
+        return;
     }
 
-    window.addEventListener('online', updateCartMode);
-    window.addEventListener('offline', updateCartMode);
+    empty.classList.add('hidden');
 
-    updateCartMode(); // initial run
-
-    // Other functions that need to access offlineCart
-    window.addOfflineItem = function (item) {
-        const cart = getOfflineCart();
-        cart.push(item);
-        saveOfflineCart(cart);
-        renderOfflineCart();
-    };
-
-    function renderOfflineCart() {
-        const container = document.getElementById('offline-cart-items');
-        const empty = document.getElementById('offline-empty');
-        if (!empty) { console.log('empty does not exist.: ') };
-        if (!container) { console.log('container does not exist.: ') };
-        if (empty) { console.log('empty does exist.: ') };
-        if (container) { console.log('container does exist.: ') };
-        if (!container || !empty) return;
-
-        const cart = getOfflineCart();
-        container.innerHTML = '';
-
-        if (!cart.length) {
-            empty.classList.remove('hidden');
-            return;
-        }
-
-        empty.classList.add('hidden'); 
-
-        cart.forEach(item => {
-            container.innerHTML += `
+    cart.forEach(item => {
+        container.innerHTML += `
             <div class="border rounded-md p-2 flex flex-col gap-2">
                 <div class="flex justify-between">
                     <span class="text-xs">${item.name}</span>
                     <span class="text-xs font-bold">${item.price}</span>
                 </div>
             </div>`;
-        });
-    }
+    });
+}
 
-    // And your offline cart helpers
-    window.getOfflineCart = function () {
-        return JSON.parse(localStorage.getItem('offlineCart') || '[]');
-    };
+// And your offline cart helpers
+window.getOfflineCart = function () {
+    return JSON.parse(localStorage.getItem('offlineCart') || '[]');
+};
 
-    window.saveOfflineCart = function (cart) {
-        localStorage.setItem('offlineCart', JSON.stringify(cart));
-    };
-});
+window.saveOfflineCart = function (cart) {
+    localStorage.setItem('offlineCart', JSON.stringify(cart));
+};
+ 
