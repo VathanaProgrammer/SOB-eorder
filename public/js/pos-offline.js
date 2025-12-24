@@ -294,7 +294,7 @@ window.getOfflineCart = function () {
 window.saveOfflineCart = function (cart) {
     localStorage.setItem('offlineCart', JSON.stringify(cart));
 };
- 
+
 
 function offlineCartHandler() {
     return {
@@ -302,34 +302,40 @@ function offlineCartHandler() {
         cart: [],
         menuItems: [],
         loadingItems: {},
-        init() { 
-            this.syncCart(); 
-            window.addEventListener('cart-updated', () => this.syncCart()); 
+        init() {
+            this.syncCart();
+            window.addEventListener('cart-updated', () => this.syncCart());
         },
-        syncCart() { 
-            this.cart = JSON.parse(localStorage.getItem('offlineCart') || '[]'); 
+        syncCart() {
+            this.cart = JSON.parse(localStorage.getItem('offlineCart') || '[]');
         },
-        toggleMenu() { 
-            this.showMenu = !this.showMenu; 
+        toggleMenu() {
+            this.showMenu = !this.showMenu;
         },
         addToCart(item) {
             const beep = new Audio('sound/sound_beep-29.mp3');
-            beep.play().catch(() => {});
-            
+            beep.play().catch(() => { });
+
+            // start loading
+            this.loadingItems[item.id] = true;
+
             if (navigator.onLine) {
                 Livewire.emit('addToCart', item.id);
-                this.loadingItems[item.id] = false;
+                // simulate async loading spinner
+                setTimeout(() => { this.loadingItems[item.id] = false; }, 500);
                 return;
             }
-            
+
             let existing = this.cart.find(i => i.id === item.id);
             if (existing) existing.qty += 1;
             else this.cart.push({ ...item, qty: 1 });
-            
+
             localStorage.setItem('offlineCart', JSON.stringify(this.cart));
             window.dispatchEvent(new CustomEvent('cart-updated'));
-            
-            setTimeout(() => { this.loadingItems[item.id] = false; }, 100);
+
+            // small delay to show loading
+            setTimeout(() => { this.loadingItems[item.id] = false; }, 500);
         }
+
     }
 }
