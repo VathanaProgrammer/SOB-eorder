@@ -1,4 +1,4 @@
-<div  x-data="offlineCartHandler()" x-init="init()"
+<div
     class="lg:w-6/12 flex flex-col bg-white border-l dark:border-gray-700 min-h-screen h-auto pr-4 px-2 py-4 dark:bg-gray-800 relative">
 
     {{-- Order Type Indicator --}}
@@ -388,16 +388,19 @@
                 </div>
             @endforelse
 
-            <div id="offline-cart" x-show="cart.length > 0" class="flex flex-col gap-1">
+            <div id="offline-cart" x-data="offlineCartHandler()" x-init="init();
+            online = navigator.onLine" x-show="!online" x-cloak
+                @offline.window="online = false" @online.window="online = true"
+                class="flex flex-col gap-1 border p-2 rounded-md">
                 <template x-for="(item, index) in cart" :key="item.id">
-                    <div class="border p-2 rounded-md flex justify-between items-center">
+                    <div class="flex justify-between items-center">
                         <div>
                             <span x-text="item.name"></span>
                             <span x-text="item.qty"></span>
                         </div>
                         <div>
-                            <button @click="item.qty-- ; syncCart()">-</button>
-                            <button @click="item.qty++ ; syncCart()">+</button>
+                            <button @click="item.qty--; syncCart()">-</button>
+                            <button @click="item.qty++; syncCart()">+</button>
                         </div>
                     </div>
                 </template>
@@ -406,6 +409,7 @@
                     No item added
                 </div>
             </div>
+
 
         </div>
     </div>
