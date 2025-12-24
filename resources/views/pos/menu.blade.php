@@ -32,37 +32,37 @@
             this.loadingItems[item.id] = true;
     
             // Play beep sound using Laravel asset
-            const beep = new Audio(@json(asset('sound/sound_beep-29.mp3')));
-            beep.play().catch(err => console.warn('Audio play failed:', err));
-    
-            // Check if item already in cart
-            let existing = this.cart.find(i => i.id === item.id);
-    
-            if (existing) {
-                // Increase quantity if already exists
-                existing.qty += 1;
-            } else {
-                // Add new item if not in cart
-                item.qty = 1;
-                item.note = '';
-                this.cart.push(item);
-            }
-    
-            localStorage.setItem('offlineCart', JSON.stringify(this.cart));
-    
-            setTimeout(() => {
-                this.loadingItems[item.id] = false;
-            }, 100);
+            const beep = new Audio("{{ asset('sound/sound_beep-29.mp3') }}"); beep.play().catch(err=> console.warn('Audio
+        play failed:', err));
+
+        // Check if item already in cart
+        let existing = this.cart.find(i => i.id === item.id);
+
+        if (existing) {
+        // Increase quantity if already exists
+        existing.qty += 1;
+        } else {
+        // Add new item if not in cart
+        item.qty = 1;
+        item.note = '';
+        this.cart.push(item);
         }
-    
-    }">
+
+        localStorage.setItem('offlineCart', JSON.stringify(this.cart));
+
+        setTimeout(() => {
+        this.loadingItems[item.id] = false;
+        }, 100);
+        }
+
+        }">
 
         <!-- Mobile Toggle Button -->
         <button @click="toggleMenu()"
             class="fixed bottom-6 right-6 z-50 md:hidden bg-skin-base text-white rounded-full shadow-lg p-4 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-skin-base transition"
             aria-label="Toggle Menu" type="button">
-            <svg x-show="!showMenu" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                stroke="currentColor" class="w-6 h-6">
+            <svg x-show="!showMenu" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
             </svg>
             <svg x-show="showMenu" x-cloak xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
