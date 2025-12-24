@@ -387,7 +387,8 @@
                     </div>
                 </div>
             @endforelse
-
+        </div>
+        
             {{-- OFFLINE CART --}}
             <div id="offline-cart" class="hidden">
                 <div id="offline-cart-items" class="flex flex-col rounded gap-1">
@@ -407,8 +408,6 @@
                 </div>
             </div>
 
-
-        </div>
     </div>
 
     <div class="lg:min-w-20 sticky bottom-0">
