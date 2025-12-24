@@ -1,6 +1,6 @@
 importScripts("https://js.pusher.com/beams/service-worker.js");
 
-const CACHE_NAME = "your-cache-name";
+const CACHE_NAME = "app-cache-v2";
 const OFFLINE_URL = "/offline"; // Make sure this path is correct
 
 self.addEventListener("install", (event) => {
