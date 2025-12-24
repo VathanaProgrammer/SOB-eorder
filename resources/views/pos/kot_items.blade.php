@@ -372,6 +372,26 @@
                         </div>
                     </div>
 
+                    {{-- OFFLINE CART --}}
+                    <div id="offline-cart" class="hidden">
+                        <div id="offline-cart-items" class="flex flex-col rounded gap-1">
+                            {{-- JS will render items here --}}
+                        </div>
+
+                        <div id="offline-empty" class="text-center text-gray-500 dark:text-gray-400 mt-4 hidden">
+                            <div class="flex flex-col items-center justify-center">
+                                <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M3 3h2l.4 2M7 13h10l4-8H5.4" />
+                                </svg>
+                                <div class="text-base">
+                                    No item added
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
                 </div>
             @empty
                 <div class="text-center text-gray-500 dark:text-gray-400 mt-4">
@@ -589,7 +609,8 @@
                             @lang('modules.order.saving')
                         </span>
                     </button> --}}
-                    <button wire:ignore class="rounded bg-yellow-600 hover:bg-yellow-700 text-white w-full p-2 relative"
+                    <button wire:ignore
+                        class="rounded bg-yellow-600 hover:bg-yellow-700 text-white w-full p-2 relative"
                         onclick="if(!navigator.onLine){ window.handleOfflineSaveOrder('draft'); } else { @this.saveOrder('draft') }"
                         wire:loading.attr="disabled" wire:loading.class="opacity-50">
                         <span wire:loading.remove wire:target="saveOrder('draft')">
@@ -943,3 +964,65 @@
         </x-slot>
     </x-dialog-modal>
 </div>
+<script>
+    const onlineCart = document.getElementById('online-cart');
+    const offlineCart = document.getElementById('offline-cart');
+
+    function updateCartMode() {
+        if (navigator.onLine) {
+            onlineCart.classList.remove('hidden');
+            offlineCart.classList.add('hidden');
+        } else {
+            onlineCart.classList.add('hidden');
+            offlineCart.classList.remove('hidden');
+            renderOfflineCart();
+        }
+    }
+
+    window.addEventListener('online', updateCartMode);
+    window.addEventListener('offline', updateCartMode);
+
+    document.addEventListener('DOMContentLoaded', updateCartMode);
+
+    const OFFLINE_CART_KEY = 'offlineCart';
+
+    function getOfflineCart() {
+        return JSON.parse(localStorage.getItem(OFFLINE_CART_KEY) || '[]');
+    }
+
+    function saveOfflineCart(cart) {
+        localStorage.setItem(OFFLINE_CART_KEY, JSON.stringify(cart));
+    }
+
+    function addOfflineItem(item) {
+        const cart = getOfflineCart();
+        cart.push(item);
+        saveOfflineCart(cart);
+        renderOfflineCart();
+    }
+
+    function renderOfflineCart() {
+        const container = document.getElementById('offline-cart-items');
+        const empty = document.getElementById('offline-empty');
+
+        const cart = getOfflineCart();
+        container.innerHTML = '';
+
+        if (!cart.length) {
+            empty.classList.remove('hidden');
+            return;
+        }
+
+        empty.classList.add('hidden');
+
+        cart.forEach(item => {
+            container.innerHTML += `
+        <div class="border rounded-md p-2 flex flex-col gap-2">
+            <div class="flex justify-between">
+                <span class="text-xs">${item.name}</span>
+                <span class="text-xs font-bold">${item.price}</span>
+            </div>
+        </div>`;
+        });
+    }
+</script>

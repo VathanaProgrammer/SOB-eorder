@@ -7,23 +7,24 @@
         showMenu: false,
         cart: [],
         menuItems: [],
-        loadingItems: {}, // track loading per item
+        loadingItems: {},
     
         init() {
-            if (!window.POS_STATE.online) {
-                this.cart = JSON.parse(localStorage.getItem('offlineCart') || '[]');
-            }
+            this.syncCart();
+        },
     
-            if (window.POS_STATE.online) { this.cart = []; };
-            if (!window.POS_STATE.online) {
+        syncCart() {
+            if (!navigator.onLine) {
                 this.cart = JSON.parse(localStorage.getItem('offlineCart') || '[]');
-            };
+            } else {
+                this.cart = [];
+            }
         },
     
         toggleMenu() {
             this.showMenu = !this.showMenu;
     
-            if (this.showMenu && !window.POS_STATE.online && this.menuItems.length === 0) {
+            if (this.showMenu && !navigator.onLine && this.menuItems.length === 0) {
                 this.menuItems = JSON.parse(localStorage.getItem('offlineMenuItems') || '[]');
             }
         },
@@ -31,33 +32,41 @@
         addToCart(item) {
             this.loadingItems[item.id] = true;
     
-            // Play beep sound using Laravel asset
-            const beep = new Audio('sound/sound_beep-29.mp3');
-            beep.play().catch(err => console.warn('Audio play failed:', err));
+            const beep = new Audio('{{ asset('sound/sound_beep-29.mp3') }}');
+            beep.play().catch(() => {});
     
-            // Check if item already in cart
+            // 🟢 ONLINE → LIVEWIRE (DO NOT TOUCH)
+            if (navigator.onLine) {
+                Livewire.emit('addToCart', item.id);
+                this.loadingItems[item.id] = false;
+                return;
+            }
+    
+            // 🔴 OFFLINE → LOCAL CART
             let existing = this.cart.find(i => i.id === item.id);
     
             if (existing) {
-                // Increase quantity if already exists
                 existing.qty += 1;
             } else {
-                // Add new item if not in cart
-                item.qty = 1;
-                item.note = '';
-                this.cart.push(item);
+                this.cart.push({
+                    id: item.id,
+                    name: item.name,
+                    price: item.price,
+                    qty: 1,
+                    note: ''
+                });
             }
     
             localStorage.setItem('offlineCart', JSON.stringify(this.cart));
     
-            // Dispatch event to update panel immediately
-            window.dispatchEvent(new CustomEvent('cart-updated', { detail: this.cart }));
+            window.dispatchEvent(
+                new CustomEvent('cart-updated')
+            );
     
             setTimeout(() => {
                 this.loadingItems[item.id] = false;
             }, 100);
         }
-    
     }">
 
         <!-- Mobile Toggle Button -->
