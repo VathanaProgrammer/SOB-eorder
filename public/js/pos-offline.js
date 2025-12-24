@@ -250,7 +250,7 @@ document.addEventListener('DOMContentLoaded', function () {
     updateCartMode(); // initial run
 
     // Other functions that need to access offlineCart
-    window.addOfflineItem = function(item) {
+    window.addOfflineItem = function (item) {
         const cart = getOfflineCart();
         cart.push(item);
         saveOfflineCart(cart);
@@ -260,8 +260,10 @@ document.addEventListener('DOMContentLoaded', function () {
     function renderOfflineCart() {
         const container = document.getElementById('offline-cart-items');
         const empty = document.getElementById('offline-empty');
-        if(!empty){ console.log('empty does not exist.: ' )};
-        if(!container){ console.log('container does not exist.: ' )};
+        if (!empty) { console.log('empty does not exist.: ') };
+        if (!container) { console.log('container does not exist.: ') };
+        if (empty) { console.log('empty does exist.: ') };
+        if (container) { console.log('container does exist.: ') };
         if (!container || !empty) return;
 
         const cart = getOfflineCart();
@@ -286,11 +288,11 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // And your offline cart helpers
-    window.getOfflineCart = function() {
+    window.getOfflineCart = function () {
         return JSON.parse(localStorage.getItem('offlineCart') || '[]');
     };
 
-    window.saveOfflineCart = function(cart) {
+    window.saveOfflineCart = function (cart) {
         localStorage.setItem('offlineCart', JSON.stringify(cart));
     };
 });
