@@ -13,15 +13,10 @@ window.addEventListener('online', () => {
 });
 
 window.addEventListener('offline', () => {
-    console.log('Offline detected, reloading page...');
+    console.log('Offline detected');
     window.POS_STATE.online = false;
     updateOfflineBanner();
     updateOnlineIndicator();
-
-    // Force reload using a timeout to let the browser settle
-    setTimeout(() => {
-        location.reload();
-    }, 100);
 });
 
 // 2. Show offline banner (optional)
