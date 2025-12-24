@@ -14,7 +14,6 @@ window.addEventListener('online', () => {
 
 window.addEventListener('offline', () => {
     console.log('Offline detected, reloading page...');
-    alert('offline acticated now reload the page!');
     window.POS_STATE.online = false;
     updateOfflineBanner();
     updateOnlineIndicator();
