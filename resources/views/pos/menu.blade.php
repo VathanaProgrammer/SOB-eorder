@@ -3,78 +3,14 @@
         $orderStats = getRestaurantOrderStats(branch()->id);
         $orderLimitReached = !$orderStats['unlimited'] && $orderStats['current_count'] >= $orderStats['order_limit'];
     @endphp
-    <div x-data="{
-        showMenu: false,
-        cart: [],
-        menuItems: [],
-        loadingItems: {},
-    
-        init() {
-            this.syncCart();
-        },
-    
-        syncCart() {
-            if (!navigator.onLine) {
-                this.cart = JSON.parse(localStorage.getItem('offlineCart') || '[]');
-            } else {
-                this.cart = [];
-            }
-        },
-    
-        toggleMenu() {
-            this.showMenu = !this.showMenu;
-    
-            if (this.showMenu && !navigator.onLine && this.menuItems.length === 0) {
-                this.menuItems = JSON.parse(localStorage.getItem('offlineMenuItems') || '[]');
-            }
-        },
-    
-        addToCart(item) {
-            this.loadingItems[item.id] = true;
-    
-            const beep = new Audio('{{ asset('sound/sound_beep-29.mp3') }}');
-            beep.play().catch(() => {});
-    
-            // 🟢 ONLINE → LIVEWIRE (DO NOT TOUCH)
-            if (navigator.onLine) {
-                Livewire.emit('addToCart', item.id);
-                this.loadingItems[item.id] = false;
-                return;
-            }
-    
-            // 🔴 OFFLINE → LOCAL CART
-            let existing = this.cart.find(i => i.id === item.id);
-    
-            if (existing) {
-                existing.qty += 1;
-            } else {
-                this.cart.push({
-                    id: item.id,
-                    name: item.name,
-                    price: item.price,
-                    qty: 1,
-                    note: ''
-                });
-            }
-    
-            localStorage.setItem('offlineCart', JSON.stringify(this.cart));
-    
-            window.dispatchEvent(
-                new CustomEvent('cart-updated')
-            );
-    
-            setTimeout(() => {
-                this.loadingItems[item.id] = false;
-            }, 100);
-        }
-    }">
+    <div x-data="offlineCartHandler()" x-init="init()">
 
         <!-- Mobile Toggle Button -->
         <button @click="toggleMenu()"
             class="fixed bottom-6 right-6 z-50 md:hidden bg-skin-base text-white rounded-full shadow-lg p-4 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-skin-base transition"
             aria-label="Toggle Menu" type="button">
-            <svg x-show="!showMenu" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                stroke="currentColor" class="w-6 h-6">
+            <svg x-show="!showMenu" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
             </svg>
             <svg x-show="showMenu" x-cloak xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"

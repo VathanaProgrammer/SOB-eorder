@@ -295,3 +295,41 @@ window.saveOfflineCart = function (cart) {
     localStorage.setItem('offlineCart', JSON.stringify(cart));
 };
  
+
+function offlineCartHandler() {
+    return {
+        showMenu: false,
+        cart: [],
+        menuItems: [],
+        loadingItems: {},
+        init() { 
+            this.syncCart(); 
+            window.addEventListener('cart-updated', () => this.syncCart()); 
+        },
+        syncCart() { 
+            this.cart = JSON.parse(localStorage.getItem('offlineCart') || '[]'); 
+        },
+        toggleMenu() { 
+            this.showMenu = !this.showMenu; 
+        },
+        addToCart(item) {
+            const beep = new Audio('sound/sound_beep-29.mp3');
+            beep.play().catch(() => {});
+            
+            if (navigator.onLine) {
+                Livewire.emit('addToCart', item.id);
+                this.loadingItems[item.id] = false;
+                return;
+            }
+            
+            let existing = this.cart.find(i => i.id === item.id);
+            if (existing) existing.qty += 1;
+            else this.cart.push({ ...item, qty: 1 });
+            
+            localStorage.setItem('offlineCart', JSON.stringify(this.cart));
+            window.dispatchEvent(new CustomEvent('cart-updated'));
+            
+            setTimeout(() => { this.loadingItems[item.id] = false; }, 100);
+        }
+    }
+}
