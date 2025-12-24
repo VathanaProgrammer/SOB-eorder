@@ -3,8 +3,43 @@
         $orderStats = getRestaurantOrderStats(branch()->id);
         $orderLimitReached = !$orderStats['unlimited'] && $orderStats['current_count'] >= $orderStats['order_limit'];
     @endphp
+    <div x-data="{
+        showMenu: false,
+        cart: [],
+        menuItems: [],
+        loadingItems: {}, // track loading per item
 
-    <div x-data="posComponent()" x-init="init()">
+        init() {
+            if (!window.POS_STATE.online) {
+                this.cart = JSON.parse(localStorage.getItem('offlineCart') || '[]');
+            }
+
+            window.addEventListener('online', () => { this.cart = []; });
+            window.addEventListener('offline', () => {
+                this.cart = JSON.parse(localStorage.getItem('offlineCart') || '[]');
+            });
+        },
+
+        toggleMenu() {
+            this.showMenu = !this.showMenu;
+
+            if (this.showMenu && !window.POS_STATE.online && this.menuItems.length === 0) {
+                this.menuItems = JSON.parse(localStorage.getItem('offlineMenuItems') || '[]');
+            }
+        },
+
+        addToCart(item) {
+            // Fixed: use plain JS instead of this.$set
+            this.loadingItems[item.id] = true;
+
+            this.cart.push(item);
+            localStorage.setItem('offlineCart', JSON.stringify(this.cart));
+
+            setTimeout(() => {
+                this.loadingItems[item.id] = false;
+            }, 300);
+        }
+    }">
 
         <!-- Mobile Toggle Button -->
         <button @click="toggleMenu()"
@@ -27,8 +62,7 @@
             style="backdrop-filter: blur(2px);" x-cloak>
 
             {{-- Search + Filters --}}
-            <div
-                class="bg-white/70 dark:bg-gray-800/70 rounded-xl border border-gray-100 dark:border-gray-700 p-3 shadow-sm space-y-3">
+            <div class="bg-white/70 dark:bg-gray-800/70 rounded-xl border border-gray-100 dark:border-gray-700 p-3 shadow-sm space-y-3">
                 <div class="flex flex-col lg:flex-row lg:items-center gap-3">
                     <div class="flex-1">
                         <form action="#" method="GET">
@@ -60,7 +94,6 @@
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 lg:w-[28rem]">
-                        {{-- Menu Filter --}}
                         <div class="relative">
                             <label for="menu-filter" class="sr-only">@lang('modules.menu.menus')</label>
                             <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -80,7 +113,6 @@
                             </select>
                         </div>
 
-                        {{-- Category Filter --}}
                         <div class="relative">
                             <label for="category-filter" class="sr-only">@lang('modules.menu.categories')</label>
                             <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -135,7 +167,23 @@
                     @forelse ($this->menuItems as $item)
                         <li class="group relative flex items-center justify-center">
                             <input type="checkbox" id="item-{{ $item->id }}" class="hidden peer"
-                                @click="addItem({{ $item->id }}, '{{ $item->item_name }}', {{ $item->price }}, {{ $item->variations_count }}, {{ $item->modifier_groups_count }})"
+                                @click="
+                                    if (!window.POS_STATE.online) {
+                                        addToCart({
+                                            id: {{ $item->id }},
+                                            name: '{{ $item->item_name }}',
+                                            price: {{ $item->price }},
+                                            qty: 1,
+                                            note: ''
+                                        });
+                                    } else {
+                                        $wire.addCartItems(
+                                            {{ $item->id }},
+                                            {{ $item->variations_count }},
+                                            {{ $item->modifier_groups_count }}
+                                        );
+                                    }
+                                "
                                 {{ $orderLimitReached ? 'disabled' : '' }}>
 
                             <label for="item-{{ $item->id }}" @class([
@@ -148,6 +196,7 @@
                                 'bg-gray-200 dark:bg-gray-800' => $orderLimitReached,
                             ])
                                 tabindex="{{ $orderLimitReached ? '-1' : '0' }}">
+
                                 {{-- Loading Overlay --}}
                                 <div wire:loading.flex
                                     wire:target="addCartItems({{ $item->id }}, {{ $item->variations_count }}, {{ $item->modifier_groups_count }})"
@@ -161,7 +210,8 @@
                                         </path>
                                     </svg>
                                 </div>
-                                {{-- Offline Loading --}}
+
+                                {{-- Offline overlay --}}
                                 <div x-show="loadingItems[{{ $item->id }}]"
                                     class="absolute inset-0 bg-white/80 dark:bg-gray-800/80 rounded-lg z-10 flex items-center justify-center">
                                     <svg class="animate-spin h-8 w-8 text-skin-base"
@@ -174,7 +224,19 @@
                                     </svg>
                                 </div>
 
-                                {{-- Item Content --}}
+                                {{-- Image block (untouched) --}}
+                                @if (!$restaurant->hide_menu_item_image_on_pos)
+                                    <div class="relative aspect-square hidden md:block">
+                                        <img class="w-full lg:w-32 lg:h-32 object-cover rounded-t-lg"
+                                            src="{{ $item->item_photo_url }}" alt="{{ $item->item_name }}" />
+                                        <span class="absolute top-1 right-1 bg-white/90 dark:bg-gray-800/90 rounded-full p-1 shadow-sm">
+                                            <img src="{{ asset('img/' . $item->type . '.svg') }}" class="h-4 w-4"
+                                                title="@lang('modules.menu.' . $item->type)" alt="" />
+                                        </span>
+                                    </div>
+                                @endif
+
+                                {{-- Content --}}
                                 <div class="p-2">
                                     <h5 class="text-xs font-medium text-gray-900 dark:text-white min-h-[1.5rem]">
                                         {{ $item->item_name }}
@@ -190,8 +252,7 @@
                                                     {{ currency_format($item->price, $restaurant->currency_id) }}
                                                 </span>
                                             @else
-                                                <span
-                                                    class="text-xs text-gray-600 dark:text-gray-300 flex items-center gap-1">
+                                                <span class="text-xs text-gray-600 dark:text-gray-300 flex items-center gap-1">
                                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none"
                                                         viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
                                                         class="w-3 h-3">
@@ -217,44 +278,34 @@
                             <p>@lang('messages.noItemAdded')</p>
                         </div>
                     </li>
-                @endforelse
+                    @endforelse
                 </ul>
+
+                <div class="flex items-center justify-center py-6 px-4">
+                    @if (!$this->allItemsLoaded)
+                        <div wire:loading wire:target="loadMoreMenuItems"
+                            class="flex items-center justify-center gap-3 text-gray-600 dark:text-gray-400">
+                            <svg class="inline animate-spin h-6 w-6 text-skin-base "
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10"
+                                    stroke="currentColor" stroke-width="4" />
+                                <path class="opacity-75" fill="currentColor"
+                                    d="M4 12a8 8 0 0 1 8-8V0C5.373 0 0 5.373 0 12zm2 5.291A7.96 7.96 0 0 1 4 12H0c0 3.042 1.135 5.824 3 7.938z" />
+                            </svg>
+                            <span class="text-sm font-medium">@lang('messages.loadingData')</span>
+                        </div>
+                    @else
+                        <div class="flex items-center gap-x-1 text-gray-500 dark:text-gray-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0" />
+                            </svg>
+                            <span class="text-sm font-medium">@lang('messages.allItemsLoaded')</span>
+                        </div>
+                    @endif
+                </div>
             </div>
         </div>
     </div>
-
-    <script>
-        function posComponent() {
-            return {
-                showMenu: false,
-                cart: [],
-                menuItems: [],
-                loadingItems: {},
-                init() {
-                    if (!window.POS_STATE.online) {
-                        this.cart = JSON.parse(localStorage.getItem('offlineCart') || '[]');
-                    }
-                    window.addEventListener('online', () => { this.cart = []; });
-                    window.addEventListener('offline', () => { this.cart = JSON.parse(localStorage.getItem('offlineCart') || '[]'); });
-                },
-                toggleMenu() {
-                    this.showMenu = !this.showMenu;
-                    if (this.showMenu && !window.POS_STATE.online && this.menuItems.length === 0) {
-                        this.menuItems = JSON.parse(localStorage.getItem('offlineMenuItems') || '[]');
-                    }
-                },
-                addItem(id, name, price, variations, modifiers) {
-                    if (!window.POS_STATE.online) {
-                        this.loadingItems[id] = true;
-                        const item = { id, name, price, qty: 1, note: '' };
-                        this.cart.push(item);
-                        localStorage.setItem('offlineCart', JSON.stringify(this.cart));
-                        setTimeout(() => { this.loadingItems[id] = false; }, 300);
-                    } else {
-                        @this.addCartItems(id, variations, modifiers);
-                    }
-                }
-            }
-        }
-    </script>
 </div>
