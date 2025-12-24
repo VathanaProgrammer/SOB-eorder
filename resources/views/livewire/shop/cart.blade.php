@@ -442,10 +442,11 @@
                             'flex items-center justify-between gap-6 border shadow-sm rounded-lg hover:shadow-md transition dark:border-gray-600 dark:lg:bg-gray-900 dark:shadow-sm lg:rounded-md',
                             'bg-gray-100 dark:bg-gray-800' => !$item->in_stock,
                             'bg-white dark:bg-gray-900' => $item->in_stock,
+                            'pr-2 sm:pr-4'
                         ]) wire:key='menu-item-{{ $item->id . microtime() }}'>
                             <div class="md:flex w-full p-3 space-x-4 flex flex-col justify-center items-center">
                                 @if ($restaurant && !$restaurant->hide_menu_item_image_on_customer_site)
-                                    <img class="object-cover w-16 h-16 rounded-md cursor-pointer lg:w-24 lg:h-24 pb-1"
+                                    <img class="object-cover w-16 h-16 rounded-md cursor-pointer lg:w-24 lg:h-24 mb-2"
                                         wire:click="showItemDetail({{ $item->id }})"
                                         src="{{ $item->item_photo_url }}" alt="{{ $item->item_name }}">
                                 @endif
@@ -470,8 +471,8 @@
                                             @lang('modules.menu.preparationTime') :
                                             {{ $item->preparation_time }} @lang('modules.menu.minutes')</div>
                                     @endif
-                                    <div class="flex md:flex-row flex-col items-center justify-between w-full gap-2 lg:gap-0">
-                                        <div>
+                                    <div class="flex md:flex-row flex-col items-center justify-between w-full gap-2 lg:gap-0 md:pe-2">
+                                        <div class="-ml-2 sm:-ml-4">
                                             @if ($item->variations_count == 0)
                                                 <span
                                                     class="font-semibold text-gray-900 dark:text-white">{{ currency_format($item->price, $restaurant->currency_id) }}</span>
@@ -483,7 +484,7 @@
                                                 <div class="text-red-500">Out of stock</div>
                                             @elseif ($restaurant->allow_customer_orders)
                                                 @if (isset($cartItemQty[$item->id]) && $cartItemQty[$item->id] > 0)
-                                                    <div class="relative flex items-center justify-start max-w-24 me-2 mt-1"
+                                                    <div class="relative flex items-center justify-start max-w-20 md:max-w-16 me-2 mt-1"
                                                         wire:key='orderItemQty-{{ $item->id }}-counter'>
                                                         <button type="button"
                                                             @if ($item->variations_count > 0) wire:click="subCartItems({{ $item->id }})"
@@ -502,9 +503,9 @@
                                                         </button>
 
                                                         <input type="text"
-                                                            wire:model='cartItemQty.{{ $item->id }}'
-                                                            class="min-w-10 bg-white border-x-0 border-gray-300 h-8 text-center text-gray-900 text-sm  block w-full py-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white "
-                                                            value="1" readonly />
+        wire:model='cartItemQty.{{ $item->id }}'
+        class="w-10 md:w-8 bg-white border-x-0 border-gray-300 h-8 text-center text-gray-900 text-sm block py-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+        value="1" readonly />
                                                         <button type="button"
                                                             wire:click="
                                                         @if ($item->variations_count > 0 || $item->modifier_groups_count > 0) addCartItems({{ $item->id }}, {{ $item->variations_count }}, {{ $item->modifier_groups_count }})
@@ -526,11 +527,9 @@
                                                         $orderStats = getRestaurantOrderStats($shopBranch->id);
                                                     @endphp
                                                     @if(($orderStats['unlimited'] || $orderStats['current_count'] < $orderStats['order_limit']))
-                                                    <div class="md:pe-4 pe-0 mt-1">
                                                     <x-cart-button
                                                                 wire:click='addCartItems({{ $item->id }}, {{ $item->variations_count }} , {{ $item->modifier_groups_count }})'
                                                                 wire:key='item-input-{{ $item->id . microtime() }}'>@lang('app.add')</x-cart-button>
-                                                    </div>
                                                     @endif
                                                 @endif
                                             @elseif ($item->variations_count > 0 && $restaurant->allow_customer_orders)
