@@ -31,18 +31,19 @@
         addToCart(item) {
             this.loadingItems[item.id] = true;
     
-            // Play beep sound using Laravel asset
-            const beep = new Audio("{{ asset('sound/sound_beep-29.mp3') }}"); beep.play().catch(err=> console.warn('Audio
+            
+            const beep = new Audio("{{ asset('sound/sound_beep-29.mp3') }}");
+            beep.play().catch(err=> console.warn('Audio
         play failed:', err));
 
-        // Check if item already in cart
+        
         let existing = this.cart.find(i => i.id === item.id);
 
         if (existing) {
-        // Increase quantity if already exists
+        
         existing.qty += 1;
         } else {
-        // Add new item if not in cart
+        
         item.qty = 1;
         item.note = '';
         this.cart.push(item);
