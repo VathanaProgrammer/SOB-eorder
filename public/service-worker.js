@@ -50,7 +50,7 @@ self.addEventListener("fetch", (event) => {
 
     // Skip unsupported schemes (chrome-extension, moz-extension, etc.)
     const url = new URL(event.request.url);
-    const supportedSchemes = ["http", "https"];ac
+    const supportedSchemes = ["http", "https"];
     if (!supportedSchemes.includes(url.protocol.replace(":", ""))) {
         return event.respondWith(fetch(event.request));
     }
