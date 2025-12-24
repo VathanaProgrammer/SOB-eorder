@@ -260,6 +260,8 @@ document.addEventListener('DOMContentLoaded', function () {
     function renderOfflineCart() {
         const container = document.getElementById('offline-cart-items');
         const empty = document.getElementById('offline-empty');
+        if(!empty){ console.log('empty does not exist.: ' )};
+        if(!container){ console.log('container does not exist.: ' )};
         if (!container || !empty) return;
 
         const cart = getOfflineCart();
