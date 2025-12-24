@@ -304,7 +304,7 @@
                             <span class="text-sm font-medium">@lang('messages.allItemsLoaded')</span>
                         </div>
                     @endif
-                </div>
+                </div> 
             </div>
         </div>
     </div>
