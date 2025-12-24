@@ -274,7 +274,7 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        empty.classList.add('hidden');
+        empty.classList.add('hidden'); 
 
         cart.forEach(item => {
             container.innerHTML += `
