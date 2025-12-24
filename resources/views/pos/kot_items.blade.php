@@ -371,27 +371,6 @@
                             </button>
                         </div>
                     </div>
-
-                    {{-- OFFLINE CART --}}
-                    <div id="offline-cart" class="hidden">
-                        <div id="offline-cart-items" class="flex flex-col rounded gap-1">
-                            {{-- JS will render items here --}}
-                        </div>
-
-                        <div id="offline-empty" class="text-center text-gray-500 dark:text-gray-400 mt-4 hidden">
-                            <div class="flex flex-col items-center justify-center">
-                                <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M3 3h2l.4 2M7 13h10l4-8H5.4" />
-                                </svg>
-                                <div class="text-base">
-                                    No item added
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-
                 </div>
             @empty
                 <div class="text-center text-gray-500 dark:text-gray-400 mt-4">
@@ -408,6 +387,26 @@
                     </div>
                 </div>
             @endforelse
+
+            {{-- OFFLINE CART --}}
+            <div id="offline-cart" class="hidden">
+                <div id="offline-cart-items" class="flex flex-col rounded gap-1">
+                    {{-- JS will render items here --}}
+                </div>
+
+                <div id="offline-empty" class="text-center text-gray-500 dark:text-gray-400 mt-4 hidden">
+                    <div class="flex flex-col items-center justify-center">
+                        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 3h2l.4 2M7 13h10l4-8H5.4" />
+                        </svg>
+                        <div class="text-base">
+                            No item added
+                        </div>
+                    </div>
+                </div>
+            </div>
+
 
         </div>
     </div>
