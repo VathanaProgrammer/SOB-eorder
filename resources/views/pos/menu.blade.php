@@ -7,7 +7,7 @@
         showMenu: false,
         cart: [],
         menuItems: [],
-        loadingItems: {}, // track loading per item
+        loadingItems: {},
 
         init() {
             if (!window.POS_STATE.online) {
@@ -15,7 +15,6 @@
                 this.menuItems = JSON.parse(localStorage.getItem('offlineMenuItems') || '[]');
                 this.menuItems.forEach(item => this.$set(this.loadingItems, item.id, false));
             }
-
             window.addEventListener('online', () => { this.cart = []; });
             window.addEventListener('offline', () => {
                 this.cart = JSON.parse(localStorage.getItem('offlineCart') || '[]');
@@ -24,7 +23,6 @@
 
         toggleMenu() {
             this.showMenu = !this.showMenu;
-
             if (this.showMenu && !window.POS_STATE.online && this.menuItems.length === 0) {
                 this.menuItems = JSON.parse(localStorage.getItem('offlineMenuItems') || '[]');
                 this.menuItems.forEach(item => {
@@ -35,19 +33,13 @@
 
         addToCart(item) {
             if (!(item.id in this.loadingItems)) this.$set(this.loadingItems, item.id, false);
-
-            this.$set(this.loadingItems, item.id, true); // start loading
-
+            this.$set(this.loadingItems, item.id, true);
             this.cart.push(item);
             localStorage.setItem('offlineCart', JSON.stringify(this.cart));
-
-            setTimeout(() => {
-                this.$set(this.loadingItems, item.id, false); // stop loading
-            }, 300);
+            setTimeout(() => { this.$set(this.loadingItems, item.id, false); }, 300);
         }
     }">
 
-        <!-- Mobile Toggle Button -->
         <button @click="toggleMenu()"
             class="fixed bottom-6 right-6 z-50 md:hidden bg-skin-base text-white rounded-full shadow-lg p-4 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-skin-base transition"
             aria-label="Toggle Menu" type="button">
@@ -62,12 +54,10 @@
             <span class="lg:hidden ml-1">@lang('menu.menu')</span>
         </button>
 
-        <!-- Menu Panel -->
         <div :class="{ 'hidden': !showMenu, ' inset-0 z-40 flex': showMenu }"
             class="md:flex flex-col bg-gray-50 lg:h-full w-full px-3 dark:bg-gray-900 transition-transform duration-300 md:static md:inset-auto md:z-auto md:translate-x-0 overflow-y-auto md:overflow-visible md:max-h-none"
             style="backdrop-filter: blur(2px);" x-cloak>
 
-            {{-- Search + Filters --}}
             <div class="bg-white/70 dark:bg-gray-800/70 rounded-xl border border-gray-100 dark:border-gray-700 p-3 shadow-sm space-y-3">
                 <div class="flex flex-col lg:flex-row lg:items-center gap-3">
                     <div class="flex-1">
@@ -154,7 +144,6 @@
                 </div>
             </div>
 
-            {{-- Menu Items Grid --}}
             <div class="mt-4 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-300 [&::-webkit-scrollbar-thumb]:bg-gray-400 hover:[&::-webkit-scrollbar-thumb]:bg-gray-500 dark:[&::-webkit-scrollbar-track]:bg-gray-700 dark:[&::-webkit-scrollbar-thumb]:bg-gray-500 dark:hover:[&::-webkit-scrollbar-thumb]:bg-gray-400"
                 x-data="{
                     loadedCount: @entangle('menuItemsLoaded'),
@@ -203,7 +192,6 @@
                             ])
                                 tabindex="{{ $orderLimitReached ? '-1' : '0' }}">
 
-                                {{-- Offline overlay --}}
                                 <div x-show="loadingItems[{{ $item->id }}] === true"
                                     class="absolute inset-0 bg-white/80 dark:bg-gray-800/80 rounded-lg z-10 flex items-center justify-center">
                                     <svg class="animate-spin h-8 w-8 text-skin-base"
@@ -215,8 +203,7 @@
                                         </path>
                                     </svg>
                                 </div>
-
-                                {{-- ...rest of your image and content --}}
+                                {{-- Rest of image/content unchanged --}}
                             </label>
                         </li>
                     @empty
