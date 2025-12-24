@@ -227,64 +227,68 @@ window.handleOfflineSaveOrder = function (orderType) {
     }
 };
 
-const onlineCart = document.getElementById('online-cart');
-const offlineCart = document.getElementById('offline-cart');
+document.addEventListener('DOMContentLoaded', function () {
+    const onlineCart = document.getElementById('online-cart');
+    const offlineCart = document.getElementById('offline-cart');
 
-function updateCartMode() {
-    if (navigator.onLine) {
-        onlineCart.classList.remove('hidden');
-        offlineCart.classList.add('hidden');
-    } else {
-        onlineCart.classList.add('hidden');
-        offlineCart.classList.remove('hidden');
+    function updateCartMode() {
+        if (!onlineCart || !offlineCart) return; // safety check
+
+        if (navigator.onLine) {
+            onlineCart.classList.remove('hidden');
+            offlineCart.classList.add('hidden');
+        } else {
+            onlineCart.classList.add('hidden');
+            offlineCart.classList.remove('hidden');
+            renderOfflineCart();
+        }
+    }
+
+    window.addEventListener('online', updateCartMode);
+    window.addEventListener('offline', updateCartMode);
+
+    updateCartMode(); // initial run
+
+    // Other functions that need to access offlineCart
+    window.addOfflineItem = function(item) {
+        const cart = getOfflineCart();
+        cart.push(item);
+        saveOfflineCart(cart);
         renderOfflineCart();
-    }
-}
+    };
 
-window.addEventListener('online', updateCartMode);
-window.addEventListener('offline', updateCartMode);
+    function renderOfflineCart() {
+        const container = document.getElementById('offline-cart-items');
+        const empty = document.getElementById('offline-empty');
+        if (!container || !empty) return;
 
-document.addEventListener('DOMContentLoaded', updateCartMode);
+        const cart = getOfflineCart();
+        container.innerHTML = '';
 
-const OFFLINE_CART_KEY = 'offlineCart';
+        if (!cart.length) {
+            empty.classList.remove('hidden');
+            return;
+        }
 
-function getOfflineCart() {
-    return JSON.parse(localStorage.getItem(OFFLINE_CART_KEY) || '[]');
-}
+        empty.classList.add('hidden');
 
-function saveOfflineCart(cart) {
-    localStorage.setItem(OFFLINE_CART_KEY, JSON.stringify(cart));
-}
-
-function addOfflineItem(item) {
-    const cart = getOfflineCart();
-    cart.push(item);
-    saveOfflineCart(cart);
-    renderOfflineCart();
-}
-
-function renderOfflineCart() {
-    const container = document.getElementById('offline-cart-items');
-    const empty = document.getElementById('offline-empty');
-
-    const cart = getOfflineCart();
-    container.innerHTML = '';
-
-    if (!cart.length) {
-        empty.classList.remove('hidden');
-        return;
+        cart.forEach(item => {
+            container.innerHTML += `
+            <div class="border rounded-md p-2 flex flex-col gap-2">
+                <div class="flex justify-between">
+                    <span class="text-xs">${item.name}</span>
+                    <span class="text-xs font-bold">${item.price}</span>
+                </div>
+            </div>`;
+        });
     }
 
-    empty.classList.add('hidden');
+    // And your offline cart helpers
+    window.getOfflineCart = function() {
+        return JSON.parse(localStorage.getItem('offlineCart') || '[]');
+    };
 
-    cart.forEach(item => {
-        container.innerHTML += `
-        <div class="border rounded-md p-2 flex flex-col gap-2">
-            <div class="flex justify-between">
-                <span class="text-xs">${item.name}</span>
-                <span class="text-xs font-bold">${item.price}</span>
-            </div>
-        </div>`;
-    });
-}
-
+    window.saveOfflineCart = function(cart) {
+        localStorage.setItem('offlineCart', JSON.stringify(cart));
+    };
+});
