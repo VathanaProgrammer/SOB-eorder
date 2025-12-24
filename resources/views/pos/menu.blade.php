@@ -7,7 +7,7 @@
         showMenu: false,
         cart: [],
         menuItems: [],
-        loadingMenu: true, // <-- new flag for menu loading
+        loadingMenu: true, // spinner flag
     
         init() {
             // Load offline cart
@@ -19,8 +19,8 @@
                 this.loadingMenu = true;
                 setTimeout(() => {
                     this.menuItems = JSON.parse(localStorage.getItem('offlineMenuItems') || '[]');
-                    this.loadingMenu = false; // hide spinner after items loaded
-                }, 500); // small delay to show loading effect
+                    this.loadingMenu = false;
+                }, 500);
             }
     
             window.addEventListener('online', () => {
@@ -30,6 +30,20 @@
             window.addEventListener('offline', () => {
                 this.cart = JSON.parse(localStorage.getItem('offlineCart') || '[]');
             });
+        },
+    
+        addToCart(item) {
+            this.loadingMenu = true;
+            this.cart.push(item);
+            localStorage.setItem('offlineCart', JSON.stringify(this.cart));
+    
+            setTimeout(() => {
+                this.loadingMenu = false;
+            }, 300);
+        },
+    
+        toggleMenu() {
+            this.showMenu = !this.showMenu;
         }
     }">
 
@@ -245,10 +259,9 @@
                                 </div>
 
                                 {{-- offline overlay --}}
-                                <div 
-                                   x-show="loadingMenu"
-                                    class="absolute inset-0 bg-white/80 dark:bg-gray-800/80 rounded-lg z-10 items-center justify-center">
-                                    <svg class="animate-spin h-6 w-6 text-skin-base"
+                                <div x-show="loadingMenu"
+                                    class="absolute inset-0 bg-white/80 dark:bg-gray-800/80 rounded-lg z-10 flex items-center justify-center">
+                                    <svg class="animate-spin h-8 w-8 text-skin-base"
                                         xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                         <circle class="opacity-25" cx="12" cy="12" r="10"
                                             stroke="currentColor" stroke-width="4"></circle>
