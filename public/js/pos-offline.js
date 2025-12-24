@@ -21,7 +21,7 @@ window.addEventListener('offline', () => {
     // Force reload using a timeout to let the browser settle
     setTimeout(() => {
         location.reload();
-    }, 100); 
+    }, 100);
 });
 
 // 2. Show offline banner (optional)
@@ -205,9 +205,9 @@ window.handleOfflineSaveOrder = function (orderType) {
             logoUrl: '',
             table: '-'
         };
-        
 
-        
+
+
         const orderData = {
             restaurantName: restaurantInfo.name || 'Restaurant',
             kotNumber: null, // optional, can generate dynamic
@@ -231,4 +231,65 @@ window.handleOfflineSaveOrder = function (orderType) {
         console.error('Failed to save offline order:', err);
     }
 };
+
+const onlineCart = document.getElementById('online-cart');
+const offlineCart = document.getElementById('offline-cart');
+
+function updateCartMode() {
+    if (navigator.onLine) {
+        onlineCart.classList.remove('hidden');
+        offlineCart.classList.add('hidden');
+    } else {
+        onlineCart.classList.add('hidden');
+        offlineCart.classList.remove('hidden');
+        renderOfflineCart();
+    }
+}
+
+window.addEventListener('online', updateCartMode);
+window.addEventListener('offline', updateCartMode);
+
+document.addEventListener('DOMContentLoaded', updateCartMode);
+
+const OFFLINE_CART_KEY = 'offlineCart';
+
+function getOfflineCart() {
+    return JSON.parse(localStorage.getItem(OFFLINE_CART_KEY) || '[]');
+}
+
+function saveOfflineCart(cart) {
+    localStorage.setItem(OFFLINE_CART_KEY, JSON.stringify(cart));
+}
+
+function addOfflineItem(item) {
+    const cart = getOfflineCart();
+    cart.push(item);
+    saveOfflineCart(cart);
+    renderOfflineCart();
+}
+
+function renderOfflineCart() {
+    const container = document.getElementById('offline-cart-items');
+    const empty = document.getElementById('offline-empty');
+
+    const cart = getOfflineCart();
+    container.innerHTML = '';
+
+    if (!cart.length) {
+        empty.classList.remove('hidden');
+        return;
+    }
+
+    empty.classList.add('hidden');
+
+    cart.forEach(item => {
+        container.innerHTML += `
+        <div class="border rounded-md p-2 flex flex-col gap-2">
+            <div class="flex justify-between">
+                <span class="text-xs">${item.name}</span>
+                <span class="text-xs font-bold">${item.price}</span>
+            </div>
+        </div>`;
+    });
+}
 
