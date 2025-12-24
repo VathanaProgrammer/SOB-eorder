@@ -52,7 +52,7 @@
     
             setTimeout(() => {
                 this.loadingItems[item.id] = false;
-            }, 00);
+            }, 100);
         }
     
     }">
