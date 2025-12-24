@@ -960,7 +960,7 @@
         </x-slot>
     </x-dialog-modal>
 </div>
-<script>
+{{-- <script>
     const onlineCart = document.getElementById('online-cart');
     const offlineCart = document.getElementById('offline-cart');
 
@@ -1021,4 +1021,4 @@
         </div>`;
         });
     }
-</script>
+</script> --}}
