@@ -31,6 +31,10 @@
         addToCart(item) {
             this.loadingItems[item.id] = true;
     
+            // Play beep sound using Laravel asset
+            const beep = new Audio(@json(asset('sound/sound_beep-29.mp3')));
+            beep.play().catch(err => console.warn('Audio play failed:', err));
+    
             // Check if item already in cart
             let existing = this.cart.find(i => i.id === item.id);
     
@@ -48,7 +52,7 @@
     
             setTimeout(() => {
                 this.loadingItems[item.id] = false;
-            }, 300);
+            }, 100);
         }
     
     }">
