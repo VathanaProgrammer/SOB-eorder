@@ -8,37 +8,49 @@
         cart: [],
         menuItems: [],
         loadingItems: {}, // track loading per item
-
+    
         init() {
             if (!window.POS_STATE.online) {
                 this.cart = JSON.parse(localStorage.getItem('offlineCart') || '[]');
             }
-
+    
             window.addEventListener('online', () => { this.cart = []; });
             window.addEventListener('offline', () => {
                 this.cart = JSON.parse(localStorage.getItem('offlineCart') || '[]');
             });
         },
-
+    
         toggleMenu() {
             this.showMenu = !this.showMenu;
-
+    
             if (this.showMenu && !window.POS_STATE.online && this.menuItems.length === 0) {
                 this.menuItems = JSON.parse(localStorage.getItem('offlineMenuItems') || '[]');
             }
         },
-
+    
         addToCart(item) {
-            // Fixed: use plain JS instead of this.$set
             this.loadingItems[item.id] = true;
-
-            this.cart.push(item);
+    
+            // Check if item already in cart
+            let existing = this.cart.find(i => i.id === item.id);
+    
+            if (existing) {
+                // Increase quantity if already exists
+                existing.qty += 1;
+            } else {
+                // Add new item if not in cart
+                item.qty = 1;
+                item.note = '';
+                this.cart.push(item);
+            }
+    
             localStorage.setItem('offlineCart', JSON.stringify(this.cart));
-
+    
             setTimeout(() => {
                 this.loadingItems[item.id] = false;
             }, 300);
         }
+    
     }">
 
         <!-- Mobile Toggle Button -->
@@ -62,7 +74,8 @@
             style="backdrop-filter: blur(2px);" x-cloak>
 
             {{-- Search + Filters --}}
-            <div class="bg-white/70 dark:bg-gray-800/70 rounded-xl border border-gray-100 dark:border-gray-700 p-3 shadow-sm space-y-3">
+            <div
+                class="bg-white/70 dark:bg-gray-800/70 rounded-xl border border-gray-100 dark:border-gray-700 p-3 shadow-sm space-y-3">
                 <div class="flex flex-col lg:flex-row lg:items-center gap-3">
                     <div class="flex-1">
                         <form action="#" method="GET">
@@ -229,7 +242,8 @@
                                     <div class="relative aspect-square hidden md:block">
                                         <img class="w-full lg:w-32 lg:h-32 object-cover rounded-t-lg"
                                             src="{{ $item->item_photo_url }}" alt="{{ $item->item_name }}" />
-                                        <span class="absolute top-1 right-1 bg-white/90 dark:bg-gray-800/90 rounded-full p-1 shadow-sm">
+                                        <span
+                                            class="absolute top-1 right-1 bg-white/90 dark:bg-gray-800/90 rounded-full p-1 shadow-sm">
                                             <img src="{{ asset('img/' . $item->type . '.svg') }}" class="h-4 w-4"
                                                 title="@lang('modules.menu.' . $item->type)" alt="" />
                                         </span>
@@ -252,7 +266,8 @@
                                                     {{ currency_format($item->price, $restaurant->currency_id) }}
                                                 </span>
                                             @else
-                                                <span class="text-xs text-gray-600 dark:text-gray-300 flex items-center gap-1">
+                                                <span
+                                                    class="text-xs text-gray-600 dark:text-gray-300 flex items-center gap-1">
                                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none"
                                                         viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
                                                         class="w-3 h-3">
@@ -304,7 +319,7 @@
                             <span class="text-sm font-medium">@lang('messages.allItemsLoaded')</span>
                         </div>
                     @endif
-                </div> 
+                </div>
             </div>
         </div>
     </div>
