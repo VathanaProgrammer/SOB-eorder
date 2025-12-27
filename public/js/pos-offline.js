@@ -305,6 +305,9 @@ function offlineCartHandler() {
         init() {
             this.syncCart();
             window.addEventListener('cart-updated', () => this.syncCart());
+
+            // Expose globally for Livewire/DOM-safe access
+            window.offlineCart = this;
         },
         syncCart() {
             this.cart = JSON.parse(localStorage.getItem('offlineCart') || '[]');
@@ -316,12 +319,10 @@ function offlineCartHandler() {
             const beep = new Audio('sound/sound_beep-29.mp3');
             beep.play().catch(() => { });
 
-            // start loading
             this.loadingItems[item.id] = true;
 
             if (navigator.onLine) {
                 Livewire.emit('addToCart', item.id);
-                // simulate async loading spinner
                 setTimeout(() => { this.loadingItems[item.id] = false; }, 500);
                 return;
             }
@@ -333,9 +334,7 @@ function offlineCartHandler() {
             localStorage.setItem('offlineCart', JSON.stringify(this.cart));
             window.dispatchEvent(new CustomEvent('cart-updated'));
 
-            // small delay to show loading
             setTimeout(() => { this.loadingItems[item.id] = false; }, 500);
         }
-
     }
 }
