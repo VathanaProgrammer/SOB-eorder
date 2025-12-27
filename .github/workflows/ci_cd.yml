@@ -9,15 +9,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # ---------- CI (GitHub Runner) ----------
+      # ------------------ CI (GitHub Runner) ------------------
       - name: Checkout code
-        uses: actions/checkout@v4  # Clone repo
+        uses: actions/checkout@v4  # Clone your repository
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: 8.3
-          extensions: mbstring, pdo, pdo_mysql
+          extensions: mbstring, pdo, pdo_mysql, sqlite
 
       - name: Ensure bootstrap/cache exists
         run: |
@@ -34,12 +34,14 @@ jobs:
 
       - name: Prepare SQLite Database for Tests
         run: |
+          mkdir -p database
           touch database/database.sqlite
+          php artisan migrate:fresh --env=testing  # Fresh migration for SQLite
 
-      - name: Run tests
-        run: php artisan test  # Stop CI if tests fail
+      - name: Run Tests
+        run: php artisan test --env=testing  # Run tests using SQLite
 
-      # ---------- CD (Deploy to Server) ----------
+      # ------------------ CD (Deploy to Production Server) ------------------
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
@@ -59,7 +61,7 @@ jobs:
             # Install production dependencies
             composer install --no-dev --optimize-autoloader
 
-            # Clear caches first (important to avoid errors)
+            # Clear old caches
             php artisan config:clear
             php artisan route:clear
             php artisan cache:clear
