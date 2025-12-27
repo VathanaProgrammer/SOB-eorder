@@ -7,22 +7,35 @@ on:
 jobs:
   ci-cd:
     runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: laravel_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd "mysqladmin ping --silent"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 3
 
     steps:
-      # ------------------ CI (GitHub Runner) ------------------
+      # ---------- CI (GitHub Runner) ----------
       - name: Checkout code
-        uses: actions/checkout@v4  # Clone your repository
+        uses: actions/checkout@v4  # Clone repo
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: 8.3
-          extensions: mbstring, pdo, pdo_mysql, sqlite
+          extensions: mbstring, pdo, pdo_mysql, tokenizer, xml
 
       - name: Ensure bootstrap/cache exists
         run: |
           mkdir -p bootstrap/cache
-          chmod -R 777 bootstrap/cache  # Runner needs write access
+          chmod -R 777 bootstrap/cache
 
       - name: Ensure storage exists
         run: |
@@ -32,16 +45,23 @@ jobs:
       - name: Install Composer dependencies
         run: composer install --no-interaction --prefer-dist
 
-      - name: Prepare SQLite Database for Tests
+      - name: Setup .env for CI
         run: |
-          mkdir -p database
-          touch database/database.sqlite
-          php artisan migrate:fresh --env=testing  # Fresh migration for SQLite
+          cp .env.example .env
+          php artisan key:generate
+          # Use MySQL for testing
+          sed -i "s/DB_CONNECTION=.*/DB_CONNECTION=mysql/" .env
+          sed -i "s/DB_DATABASE=.*/DB_DATABASE=laravel_test/" .env
+          sed -i "s/DB_USERNAME=.*/DB_USERNAME=root/" .env
+          sed -i "s/DB_PASSWORD=.*/DB_PASSWORD=root/" .env
+
+      - name: Run Migrations
+        run: php artisan migrate --force
 
       - name: Run Tests
-        run: php artisan test --env=testing  # Run tests using SQLite
+        run: php artisan test --stop-on-failure
 
-      # ------------------ CD (Deploy to Production Server) ------------------
+      # ---------- CD (Deploy to Server) ----------
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
@@ -52,7 +72,6 @@ jobs:
       - name: Deploy to Production Server
         run: |
           ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
-            # Go to project directory
             cd /var/www/html/SOB-eorder
 
             # Pull latest code
@@ -61,7 +80,7 @@ jobs:
             # Install production dependencies
             composer install --no-dev --optimize-autoloader
 
-            # Clear old caches
+            # Clear caches
             php artisan config:clear
             php artisan route:clear
             php artisan cache:clear
@@ -69,10 +88,10 @@ jobs:
             # Optimize Laravel
             php artisan optimize
 
-            # Ensure proper permissions for web server
+            # Fix permissions
             sudo chown -R www-data:www-data bootstrap/cache storage
             sudo chmod -R 775 bootstrap/cache storage
 
-            # Reload Apache to pick up changes
+            # Reload Apache
             sudo systemctl reload apache2
           EOF
