@@ -50,5 +50,5 @@ jobs:
             # Clear caches (optional, but safe)
             php artisan config:clear
             php artisan cache:clear
-            php artisan route:clear
+            php artisan route:clear 
           EOF
