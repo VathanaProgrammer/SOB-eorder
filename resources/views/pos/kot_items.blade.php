@@ -409,8 +409,6 @@
                     No item added
                 </div>
             </div>
-
-
         </div>
     </div>
 
