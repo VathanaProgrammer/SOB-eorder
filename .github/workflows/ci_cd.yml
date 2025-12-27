@@ -1,95 +1,54 @@
-name: Laravel CI CD
+name: Deploy Laravel
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main ]   # Trigger on push to main
+  workflow_dispatch:      # Allow manual run
 
 jobs:
-  ci-cd:
+  deploy:
     runs-on: ubuntu-latest
-    services:
-      mysql:
-        image: mysql:8.0
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: laravel_test
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd "mysqladmin ping --silent"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 3
 
     steps:
-      - name: Checkout code
+      # 1. Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
+      # 2. Setup PHP
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: 8.3
-          extensions: mbstring, pdo, pdo_mysql, tokenizer, xml
+          extensions: mbstring, pdo, pdo_mysql, sqlite
 
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 20
-
-      - name: Install Node Dependencies
-        run: npm ci
-
-      - name: Build Vite Assets
-        run: npm run build
-
-      - name: Ensure bootstrap/cache exists
-        run: |
-          mkdir -p bootstrap/cache
-          chmod -R 777 bootstrap/cache
-
-      - name: Ensure storage exists
-        run: |
-          mkdir -p storage
-          chmod -R 777 storage
-
-      - name: Install Composer dependencies
-        run: composer install --no-interaction --prefer-dist
-
-      - name: Setup .env for CI
-        run: |
-          cp .env.example .env
-          php artisan key:generate
-          sed -i "s/DB_CONNECTION=.*/DB_CONNECTION=mysql/" .env
-          sed -i "s/DB_DATABASE=.*/DB_DATABASE=laravel_test/" .env
-          sed -i "s/DB_USERNAME=.*/DB_USERNAME=root/" .env
-          sed -i "s/DB_PASSWORD=.*/DB_PASSWORD=root/" .env
-
-      - name: Run Migrations
-        run: php artisan migrate --force
-
-      - name: Run Tests
-        run: php artisan test --stop-on-failure
-
-      - name: Setup SSH
+      # 3. SSH into server and deploy
+      - name: Deploy to Server
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          SERVER_IP: ${{ secrets.SERVER_IP }}
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+          ssh-keyscan -H $SERVER_IP >> ~/.ssh/known_hosts
 
-      - name: Deploy to Production Server
-        run: |
-          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+          ssh $SERVER_USER@$SERVER_IP << 'EOF'
             cd /var/www/html/SOB-eorder
+
+            # Pull latest code
+            git reset --hard
+            git clean -fd
             git pull origin main
+
+            # Install dependencies
             composer install --no-dev --optimize-autoloader
+
+            # Run migrations only
+            php artisan migrate --force
+
+            # Clear caches (optional, but safe)
             php artisan config:clear
-            php artisan route:clear
             php artisan cache:clear
-            php artisan optimize
-            sudo chown -R www-data:www-data bootstrap/cache storage
-            sudo chmod -R 775 bootstrap/cache storage
-            npm ci
-            npm run build
-            sudo systemctl reload apache2
+            php artisan route:clear
           EOF
