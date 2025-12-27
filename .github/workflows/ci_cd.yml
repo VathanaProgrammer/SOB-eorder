@@ -1,53 +1,72 @@
-name: Laravel CI CD  # Name of the workflow, shown in GitHub Actions
+name: Laravel CI CD
 
 on:
   push:
-    branches: [ main ]  # Trigger workflow only on push to main branch
+    branches: [ main ]  # Trigger only on main branch push
 
 jobs:
   ci-cd:
-    runs-on: ubuntu-latest  # Use a temporary Ubuntu VM provided by GitHub
+    runs-on: ubuntu-latest
 
     steps:
-      # ---------- CI (Continuous Integration) ----------
+      # ---------- CI (GitHub Runner) ----------
       - name: Checkout code
-        uses: actions/checkout@v4  # Clone your GitHub repository into runner
+        uses: actions/checkout@v4  # Clone repo
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.3  # Install PHP 8.3 on the runner
-          extensions: mbstring, pdo, pdo_mysql  # Enable Laravel required extensions
+          php-version: 8.3
+          extensions: mbstring, pdo, pdo_mysql
+
+      - name: Ensure bootstrap/cache exists
+        run: |
+          mkdir -p bootstrap/cache
+          chmod -R 777 bootstrap/cache  # Runner needs write access
+
+      - name: Ensure storage exists
+        run: |
+          mkdir -p storage
+          chmod -R 777 storage
 
       - name: Install Composer dependencies
         run: composer install --no-interaction --prefer-dist
-        # Install all PHP packages from composer.json into vendor/
-        # --no-interaction avoids prompts, --prefer-dist speeds up download
-
-      - name: Prepare Laravel
-        run: php artisan key:generate --show  # Only generate key if missing
 
       - name: Run tests
-        run: php artisan test  # Run all Laravel PHPUnit tests
-        # If tests fail, workflow stops and deployment will NOT happen
+        run: php artisan test  # Stop CI if tests fail
 
-      # ---------- CD (Continuous Deployment) ----------
+      # ---------- CD (Deploy to Server) ----------
       - name: Setup SSH
         run: |
-          mkdir -p ~/.ssh  # Create SSH directory if it doesn't exist
+          mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
-          # Save private key from GitHub Secrets
-          chmod 600 ~/.ssh/id_ed25519  # Restrict permissions
+          chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
-          # Add server fingerprint to known_hosts to avoid confirmation prompt
 
       - name: Deploy to Production Server
         run: |
           ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
-            cd /var/www/html/SOB-eorder  # Change directory to your Laravel project on server
-            git pull origin main  # Pull latest code from GitHub
+            # Go to project directory
+            cd /var/www/html/SOB-eorder
+
+            # Pull latest code
+            git pull origin main
+
+            # Install production dependencies
             composer install --no-dev --optimize-autoloader
-            # Install production dependencies only, optimize autoload files
-            php artisan migrate --force  # Run database migrations in production
-            php artisan optimize  # Cache config/routes/views for better performance
-          EOF  # End of SSH session
+
+            # Clear caches first (important to avoid errors)
+            php artisan config:clear
+            php artisan route:clear
+            php artisan cache:clear
+
+            # Optimize Laravel
+            php artisan optimize
+
+            # Ensure proper permissions for web server
+            sudo chown -R www-data:www-data bootstrap/cache storage
+            sudo chmod -R 775 bootstrap/cache storage
+
+            # Reload Apache to pick up changes
+            sudo systemctl reload apache2
+          EOF
