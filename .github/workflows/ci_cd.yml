@@ -40,7 +40,7 @@ jobs:
             git reset --hard
             git clean -fd
             git pull origin main
-
+ 
             # Install dependencies
             composer install --no-dev --optimize-autoloader
 
