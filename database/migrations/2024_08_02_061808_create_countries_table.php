@@ -20,8 +20,7 @@ return new class extends Migration
             $table->string('phonecode');
 
             // Indexes
-            //commented out when set up CI-CD
-            // $table->primary(['id']);
+            $table->primary(['id']);
             $table->index(['countries_code']);
         });
 

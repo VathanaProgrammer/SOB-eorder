@@ -2,7 +2,7 @@ name: Laravel CI CD
 
 on:
   push:
-    branches: [ main ]  # Trigger only on main branch push
+    branches: [ main ]
 
 jobs:
   ci-cd:
@@ -22,15 +22,25 @@ jobs:
           --health-retries 3
 
     steps:
-      # ---------- CI (GitHub Runner) ----------
       - name: Checkout code
-        uses: actions/checkout@v4  # Clone repo
+        uses: actions/checkout@v4
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: 8.3
           extensions: mbstring, pdo, pdo_mysql, tokenizer, xml
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: Install Node Dependencies
+        run: npm ci
+
+      - name: Build Vite Assets
+        run: npm run build
 
       - name: Ensure bootstrap/cache exists
         run: |
@@ -49,7 +59,6 @@ jobs:
         run: |
           cp .env.example .env
           php artisan key:generate
-          # Use MySQL for testing
           sed -i "s/DB_CONNECTION=.*/DB_CONNECTION=mysql/" .env
           sed -i "s/DB_DATABASE=.*/DB_DATABASE=laravel_test/" .env
           sed -i "s/DB_USERNAME=.*/DB_USERNAME=root/" .env
@@ -61,7 +70,6 @@ jobs:
       - name: Run Tests
         run: php artisan test --stop-on-failure
 
-      # ---------- CD (Deploy to Server) ----------
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
@@ -73,25 +81,15 @@ jobs:
         run: |
           ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
             cd /var/www/html/SOB-eorder
-
-            # Pull latest code
             git pull origin main
-
-            # Install production dependencies
             composer install --no-dev --optimize-autoloader
-
-            # Clear caches
             php artisan config:clear
             php artisan route:clear
             php artisan cache:clear
-
-            # Optimize Laravel
             php artisan optimize
-
-            # Fix permissions
             sudo chown -R www-data:www-data bootstrap/cache storage
             sudo chmod -R 775 bootstrap/cache storage
-
-            # Reload Apache
+            npm ci
+            npm run build
             sudo systemctl reload apache2
           EOF
