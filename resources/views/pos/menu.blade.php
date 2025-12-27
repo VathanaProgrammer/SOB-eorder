@@ -134,7 +134,7 @@
                             <input type="checkbox" id="item-{{ $item->id }}" class="hidden peer"
                                 @click="
                                     if (!window.POS_STATE.online) {
-                                        addToCart({
+                                        $root.addToCart({
                                             id: {{ $item->id }},
                                             name: '{{ $item->item_name }}',
                                             price: {{ $item->price }},
